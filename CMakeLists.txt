@@ -106,6 +106,7 @@ option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence, show the current gam
 option(USE_MGBA "Enables GBA controllers emulation using libmgba" ON)
 option(ENABLE_AUTOUPDATE "Enables support for automatic updates" ON)
 option(USE_RETRO_ACHIEVEMENTS "Enables integration with retroachievements.org" ON)
+option(LIBRETRO "Build as a libretro core" OFF)
 
 # Maintainers: if you consider blanket disabling this for your users, please
 # consider the following points:
@@ -113,7 +114,7 @@ option(USE_RETRO_ACHIEVEMENTS "Enables integration with retroachievements.org" O
 #    launch).
 #  * The Dolphin team relies on the data in order to understand the behavior
 #    of our software in the wild.
-option(ENABLE_ANALYTICS "Enables opt-in Analytics collection" ON)
+option(ENABLE_ANALYTICS "Enables opt-in Analytics collection" OFF)
 
 option(ENCODE_FRAMEDUMPS "Encode framedumps in AVI format" ON)
 
@@ -121,7 +122,11 @@ option(ENABLE_GPROF "Enable gprof profiling (must be using Debug build)" OFF)
 option(FASTLOG "Enable all logs" OFF)
 option(OPROFILING "Enable profiling" OFF)
 
-# TODO: Add DSPSpy
+if (MSVC)
+	set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+endif()
+
 option(DSPTOOL "Build dsptool" OFF)
 
 # RetroAchievements developer tools require Windows hooks
@@ -475,6 +480,21 @@ if(ANDROID)
   SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 endif()
 
+if(LIBRETRO)
+	set(USE_DISCORD_PRESENCE 0)
+	set(USE_UPNP 0)
+	set(ENABLE_ALSA 0)
+	set(ENABLE_PULSEAUDIO 0)
+	set(ENABLE_OPENAL 0)
+	set(ENABLE_LLVM 0)
+	set(ENABLE_ANALYTICS 0)
+	set(ENABLE_ANALYTICS 0)
+	set(ENABLE_FRAMEDUMPS 0)
+	set(ENABLE_QT 0)
+	add_definitions(-D__LIBRETRO__)
+	check_and_add_flag(FPIC -dpic)
+endif()
+
 if(ENABLE_HEADLESS)
   message(STATUS "Enabling Headless! Disabling GUI.")
   set(ENABLE_QT 0)
@@ -536,7 +556,7 @@ if(ENABLE_EGL)
 endif()
 
 if(ENCODE_FRAMEDUMPS)
-  if(WIN32)
+	if(MSVC)
     if(_M_X86_64)
       set(FFMPEG_DIR Externals/FFmpeg-bin/x64)
     elseif(_M_ARM_64)
@@ -592,7 +612,10 @@ if(ENABLE_EVDEV)
     add_definitions(-DHAVE_LIBUDEV=1)
     add_definitions(-DHAVE_LIBEVDEV=1)
   else()
-    message(FATAL_ERROR "Couldn't find libevdev and/or libudev. Can't build evdev controller backend.\nDisable ENABLE_EVDEV if you wish to build without controller support")
+		message(STATUS "Couldn't find libevdev and/or libudev. Can't build evdev controller backend.")
+		if(NOT LIBRETRO)
+			message(FATAL_ERROR "Disable ENABLE_EVDEV if you wish to build without evdev controller backend support")
+		endif()
   endif()
 endif()
 
