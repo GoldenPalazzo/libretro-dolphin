@@ -218,7 +218,7 @@ if(USE_JACK)
   target_compile_definitions(cubeb PRIVATE USE_JACK)
 endif()
 
-if(USE_SNDIO)
+if(USE_SNDIO AND NOT LIBRETRO)
   target_sources(cubeb PRIVATE cubeb/src/cubeb_sndio.c)
   target_compile_definitions(cubeb PRIVATE USE_SNDIO)
 endif()
