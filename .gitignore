@@ -45,3 +45,5 @@ CMakeLists.txt.user
 .flatpak-builder
 # Ignore cmake cache
 .cache/
+# Personal usage scripts
+justfile
