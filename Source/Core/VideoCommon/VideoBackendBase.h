@@ -64,7 +64,6 @@ public:
   // Wrapper function which pushes the event to the GPU thread.
   void DoState(PointerWrap& p);
 
-protected:
   // For hardware backends
   bool InitializeShared(std::unique_ptr<AbstractGfx> gfx,
                         std::unique_ptr<VertexManagerBase> vertex_manager,
@@ -80,6 +79,7 @@ protected:
                         std::unique_ptr<TextureCacheBase> texture_cache);
   void ShutdownShared();
 
+protected:
   bool m_initialized = false;
 };
 

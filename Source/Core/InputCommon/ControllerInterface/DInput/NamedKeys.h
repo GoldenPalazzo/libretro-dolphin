@@ -1,5 +1,8 @@
 // Copyright 2010 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
+#ifdef __MINGW32__
+#define DIK_PREVTRACK 0x98
+#endif
 
 {DIK_A, "A"}, {DIK_B, "B"}, {DIK_C, "C"}, {DIK_D, "D"}, {DIK_E, "E"}, {DIK_F, "F"}, {DIK_G, "G"},
     {DIK_H, "H"}, {DIK_I, "I"}, {DIK_J, "J"}, {DIK_K, "K"}, {DIK_L, "L"}, {DIK_M, "M"},

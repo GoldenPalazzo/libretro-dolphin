@@ -205,6 +205,7 @@ private:
   struct Impl;
   std::unique_ptr<Impl> m_impl;
 
+  bool m_emu_thread = false;
   bool m_separate_cpu_and_gpu_threads = false;
   bool m_mmu_enabled = false;
   bool m_pause_on_panic_enabled = false;

@@ -8,7 +8,7 @@
 
 namespace Null
 {
-class NullGfx final : public AbstractGfx
+class NullGfx : public AbstractGfx
 {
 public:
   NullGfx();

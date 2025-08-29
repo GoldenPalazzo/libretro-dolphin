@@ -3,6 +3,9 @@
 
 #pragma once
 
+// There is no GLuint, I was compelled to add it
+#include "Common/GL/GLExtensions/GLExtensions.h"
+
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/Constants.h"
 
@@ -89,6 +92,8 @@ public:
 
   // Restores FBO binding after it's been changed.
   void RestoreFramebufferBinding();
+
+  void SetSystemFrameBuffer(GLuint fbo);
 
   SurfaceInfo GetSurfaceInfo() const override;
 

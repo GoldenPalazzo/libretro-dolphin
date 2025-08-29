@@ -71,6 +71,7 @@ public:
   void RunGpu();
   void GpuMaySleep();
   void RunGpuLoop();
+  void StopGpuLoop();
   void ExitGpuLoop();
   void EmulatorState(bool running);
   void ResetVideoBuffer();

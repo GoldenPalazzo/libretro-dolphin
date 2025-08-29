@@ -54,6 +54,7 @@ Make AA apply instantly during gameplay if possible
 #include "VideoBackends/OGL/ProgramShaderCache.h"
 #include "VideoBackends/OGL/SamplerCache.h"
 
+#include "VideoCommon/EFBInterface.h"
 #include "VideoCommon/FramebufferManager.h"
 #include "VideoCommon/TextureCacheBase.h"
 #include "VideoCommon/VideoCommon.h"
@@ -195,25 +196,29 @@ bool VideoBackend::FillBackendInfo(GLContext* context)
 
 bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
 {
-  std::unique_ptr<GLContext> main_gl_context =
-      GLContext::Create(wsi, g_Config.stereo_mode == StereoMode::QuadBuffer, true, false,
-                        Config::Get(Config::GFX_PREFER_GLES));
-  if (!main_gl_context)
-    return false;
+  if (!g_efb_interface)
+  {
+    std::unique_ptr<GLContext> main_gl_context =
+        GLContext::Create(wsi, g_Config.stereo_mode == StereoMode::QuadBuffer, true, false,
+                          Config::Get(Config::GFX_PREFER_GLES));
+    if (!main_gl_context)
+      return false;
 
-  if (!FillBackendInfo(main_gl_context.get()))
-    return false;
+    if (!FillBackendInfo(main_gl_context.get()))
+      return false;
 
-  auto gfx = std::make_unique<OGLGfx>(std::move(main_gl_context), wsi.render_surface_scale);
-  ProgramShaderCache::Init();
-  g_sampler_cache = std::make_unique<SamplerCache>();
+    auto gfx = std::make_unique<OGLGfx>(std::move(main_gl_context), wsi.render_surface_scale);
+    ProgramShaderCache::Init();
+    g_sampler_cache = std::make_unique<SamplerCache>();
 
-  auto vertex_manager = std::make_unique<VertexManager>();
-  auto perf_query = GetPerfQuery(gfx->IsGLES());
-  auto bounding_box = std::make_unique<OGLBoundingBox>();
+    auto vertex_manager = std::make_unique<VertexManager>();
+    auto perf_query = GetPerfQuery(gfx->IsGLES());
+    auto bounding_box = std::make_unique<OGLBoundingBox>();
 
-  return InitializeShared(std::move(gfx), std::move(vertex_manager), std::move(perf_query),
-                          std::move(bounding_box));
+    return InitializeShared(std::move(gfx), std::move(vertex_manager), std::move(perf_query),
+                            std::move(bounding_box));
+  }
+  return true; //TODO: check if it doesn't work
 }
 
 void VideoBackend::Shutdown()

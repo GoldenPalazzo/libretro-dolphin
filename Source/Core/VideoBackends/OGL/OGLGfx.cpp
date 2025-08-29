@@ -725,6 +725,11 @@ void OGLGfx::RestoreFramebufferBinding()
       m_current_framebuffer ? static_cast<OGLFramebuffer*>(m_current_framebuffer)->GetFBO() : 0);
 }
 
+void OGLGfx::SetSystemFrameBuffer(GLuint fbo)
+{
+  m_system_framebuffer->SetFBO(fbo);
+}
+
 SurfaceInfo OGLGfx::GetSurfaceInfo() const
 {
   return {std::max(m_main_gl_context->GetBackBufferWidth(), 1u),

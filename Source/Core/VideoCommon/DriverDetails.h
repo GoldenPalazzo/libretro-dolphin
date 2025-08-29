@@ -65,6 +65,7 @@ enum Driver
   DRIVER_FREEDRENO,    // OSS Adreno driver
   DRIVER_IMGTEC,       // Official PowerVR driver
   DRIVER_VIVANTE,      // Official Vivante driver
+  DRIVER_V3D,          // OSS Broadcom V3D driver
   DRIVER_PORTABILITY,  // Vulkan via Metal on macOS
   DRIVER_APPLE,        // Metal on macOS
   DRIVER_UNKNOWN       // Unknown driver, default to official hardware driver

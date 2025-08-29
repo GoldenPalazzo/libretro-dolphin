@@ -23,7 +23,6 @@ public:
 
   static constexpr const char* NAME = "OGL";
 
-private:
   bool InitializeGLExtensions(GLContext* context);
   bool FillBackendInfo(GLContext* context);
 };

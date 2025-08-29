@@ -135,7 +135,7 @@ void EnableCompression(bool compression)
   s_use_compression = compression;
 }
 
-static void DoState(Core::System& system, PointerWrap& p)
+void DoState(Core::System& system, PointerWrap& p)
 {
   bool is_wii = system.IsWii() || system.IsMIOS();
   const bool is_wii_currently = is_wii;

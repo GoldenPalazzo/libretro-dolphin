@@ -33,6 +33,10 @@
 
 namespace Config
 {
+// Main.Libretro
+
+const Info<bool> MAIN_EMU_THREAD{{System::Main, "Libretro", "EmuThread"}, true};
+
 // Main.Core
 
 const Info<bool> MAIN_SKIP_IPL{{System::Main, "Core", "SkipIPL"}, true};

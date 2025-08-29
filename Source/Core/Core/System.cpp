@@ -110,6 +110,7 @@ System::~System() = default;
 
 void System::Initialize()
 {
+  m_emu_thread = Config::Get(Config::MAIN_EMU_THREAD);
   m_separate_cpu_and_gpu_threads = Config::Get(Config::MAIN_CPU_THREAD);
   m_mmu_enabled = Config::Get(Config::MAIN_MMU);
   m_pause_on_panic_enabled = Config::Get(Config::MAIN_PAUSE_ON_PANIC);

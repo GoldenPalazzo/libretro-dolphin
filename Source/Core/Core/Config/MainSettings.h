@@ -51,6 +51,10 @@ enum class HSPDeviceType : int;
 
 namespace Config
 {
+// Main.Libretro
+//
+extern const Info<bool> MAIN_EMU_THREAD;
+
 // Main.Core
 
 extern const Info<bool> MAIN_SKIP_IPL;

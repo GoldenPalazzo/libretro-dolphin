@@ -106,6 +106,9 @@ void ControllerInterface::ChangeWindow(void* hwnd, WindowChangeReason reason)
   if (!m_is_init)
     return;
 
+  if (m_wsi.render_window == hwnd)
+    return;
+
   // This shouldn't use render_surface so no need to update it.
   m_wsi.render_window = hwnd;
 
