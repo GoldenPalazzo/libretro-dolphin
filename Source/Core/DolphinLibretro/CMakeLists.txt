@@ -16,7 +16,8 @@ endif()
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/Externals/Libretro/Include
-	${CMAKE_SOURCE_DIR}/Externals/Vulkan/Include
+	${CMAKE_SOURCE_DIR}/Externals/Vulkan-Headers/include
+	${CMAKE_SOURCE_DIR}/Externals/VulkanMemoryAllocator/include
 )
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
