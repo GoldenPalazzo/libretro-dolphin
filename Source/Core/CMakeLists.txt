@@ -37,7 +37,7 @@ if (APPLE AND ENABLE_QT)
   add_custom_target(build_final_bundle ALL
     COMMAND ${CMAKE_COMMAND} -E remove_directory
     ${DOLPHIN_MAC_BUNDLE}
-    
+
     COMMAND cp -R
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DolphinQt.app
     ${DOLPHIN_MAC_BUNDLE}
@@ -51,9 +51,9 @@ if (APPLE AND ENABLE_QT)
     COMMAND plutil
     -replace CFBundleExecutable -string Dolphin
     ${DOLPHIN_MAC_BUNDLE}/Contents/Info.plist
-    
+
     DEPENDS dolphin-emu)
-  
+
   if (ENABLE_AUTOUPDATE)
     add_dependencies(build_final_bundle MacUpdater)
 
@@ -85,4 +85,8 @@ if (APPLE AND ENABLE_QT)
       "${MACOS_CODE_SIGNING_IDENTITY}"
       "${DOLPHIN_MAC_BUNDLE}")
   endif()
+endif()
+
+if(LIBRETRO)
+	add_subdirectory(DolphinLibretro)
 endif()

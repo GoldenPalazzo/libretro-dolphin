@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <cctype>
 
 #include "Common/BitUtils.h"
 #include "Common/ChunkFile.h"

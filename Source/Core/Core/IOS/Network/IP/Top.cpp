@@ -53,6 +53,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef __MINGW32__
+#undef interface
+#endif
+
 #ifdef __ANDROID__
 #include "jni/AndroidCommon/AndroidCommon.h"
 #endif
@@ -351,6 +355,9 @@ static std::optional<DefaultInterface> GetSystemDefaultInterface()
 {
   auto routing_table = GetSystemInterfaceRouting();
 #ifdef _WIN32
+#ifndef NET_IFINDEX_UNSPECIFIED
+	#define NET_IFINDEX_UNSPECIFIED (NET_IFINDEX)(0)
+#endif
   std::unique_ptr<MIB_IPADDRTABLE> ip_table;
   DWORD ip_table_size = 0;
   if (GetIpAddrTable(nullptr, &ip_table_size, FALSE) == ERROR_INSUFFICIENT_BUFFER)

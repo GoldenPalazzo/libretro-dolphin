@@ -61,7 +61,10 @@
 #include "DiscIO/VolumeDisc.h"
 #include "DiscIO/VolumeWad.h"
 
-static std::vector<std::string> ReadM3UFile(const std::string& m3u_path,
+#ifndef __LIBRETRO__
+static
+#endif
+std::vector<std::string> ReadM3UFile(const std::string& m3u_path,
                                             const std::string& folder_path)
 {
   std::vector<std::string> result;
@@ -204,11 +207,21 @@ std::unique_ptr<BootParameters> BootParameters::GenerateFromFile(std::vector<std
     return {};
   }
 
+#ifndef __LIBRETRO__
   std::string folder_path;
+#endif
   std::string extension;
-  SplitPath(paths.front(), &folder_path, nullptr, &extension);
+  SplitPath(
+      paths.front(),
+#ifndef __LIBRETRO__
+      &folder_path,
+#else
+      nullptr,
+#endif
+      nullptr, &extension);
   Common::ToLower(&extension);
 
+#ifndef __LIBRETRO__
   if (extension == ".m3u" || extension == ".m3u8")
   {
     paths = ReadM3UFile(paths.front(), folder_path);
@@ -221,6 +234,7 @@ std::unique_ptr<BootParameters> BootParameters::GenerateFromFile(std::vector<std
     SplitPath(paths.front(), nullptr, nullptr, &extension);
     Common::ToLower(&extension);
   }
+#endif
 
   std::string path = paths.front();
   if (paths.size() == 1)

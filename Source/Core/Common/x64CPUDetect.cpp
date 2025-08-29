@@ -21,7 +21,7 @@
 #include "Common/MsgHandler.h"
 #include "Common/StringUtil.h"
 
-#ifndef _WIN32
+#ifndef _MSC_VER
 
 #ifdef __FreeBSD__
 #include <unistd.h>

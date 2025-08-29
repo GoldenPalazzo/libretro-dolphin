@@ -195,6 +195,7 @@ private:
   u32 m_exram_mask = 0;
 
   bool m_is_fastmem_arena_initialized = false;
+  u8* single_physical_base = nullptr;
 
   // STATE_TO_SAVE
   // Save the Init(), Shutdown() state

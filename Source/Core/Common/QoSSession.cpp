@@ -3,7 +3,7 @@
 
 #include "Common/QoSSession.h"
 
-#if defined(_WIN32)
+#if defined(_MSC_VER)
 #include <Qos2.h>
 #pragma comment(lib, "qwave")
 #endif
@@ -12,7 +12,7 @@
 
 namespace Common
 {
-#if defined(_WIN32)
+#if defined(_MSC_VER)
 QoSSession::QoSSession(ENetPeer* peer, int tos_val) : m_peer(peer)
 {
   QOS_VERSION ver = {1, 0};
@@ -24,7 +24,7 @@ QoSSession::QoSSession(ENetPeer* peer, int tos_val) : m_peer(peer)
 
   sin.sin_family = AF_INET;
   sin.sin_port = ENET_HOST_TO_NET_16(peer->host->address.port);
-  sin.sin_addr.s_addr = peer->host->address.host;
+  sin.sin_addr.s_adMSC_VER = peer->host->address.host;
 
   if (QOSAddSocketToFlow(m_qos_handle, peer->host->socket, reinterpret_cast<PSOCKADDR>(&sin),
                          QOSTrafficTypeControl, QOS_NON_ADAPTIVE_FLOW, &m_qos_flow_id))
@@ -59,7 +59,12 @@ QoSSession::QoSSession(ENetPeer* peer, int tos_val)
   setsockopt(peer->host->socket, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
 #endif
 
+#ifdef __MINGW32__
+  m_success =
+      setsockopt(peer->host->socket, IPPROTO_IP, 3, (const char*)&tos_val, sizeof(tos_val)) == 0;
+#else
   m_success = setsockopt(peer->host->socket, IPPROTO_IP, IP_TOS, &tos_val, sizeof(tos_val)) == 0;
+#endif
 }
 
 QoSSession::~QoSSession() = default;
@@ -69,7 +74,7 @@ QoSSession& QoSSession::operator=(QoSSession&& session)
 {
   if (this != &session)
   {
-#if defined(_WIN32)
+#if defined(_MSC_VER)
     m_qos_handle = session.m_qos_handle;
     m_qos_flow_id = session.m_qos_flow_id;
     m_peer = session.m_peer;

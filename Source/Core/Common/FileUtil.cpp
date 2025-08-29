@@ -69,10 +69,10 @@ namespace fs = std::filesystem;
 namespace File
 {
 #ifdef ANDROID
-static std::string s_android_sys_directory;
 static std::string s_android_driver_directory;
 static std::string s_android_lib_directory;
 #endif
+static std::string s_sys_directory;
 
 #ifdef __APPLE__
 static Common::DynamicLibrary s_security_framework;
@@ -778,12 +778,13 @@ static std::string CreateSysDirectoryPath()
 #endif
 
 #if defined(__APPLE__)
+  SYSDATA_DIR
   const std::string sys_directory = GetBundleDirectory() + DIR_SEP SYSDATA_DIR DIR_SEP;
 #elif defined(_WIN32) || defined(LINUX_LOCAL_DEV)
   const std::string sys_directory = GetExeDirectory() + DIR_SEP SYSDATA_DIR DIR_SEP;
 #elif defined ANDROID
-  const std::string sys_directory = s_android_sys_directory + DIR_SEP;
-  ASSERT_MSG(COMMON, !s_android_sys_directory.empty(), "Sys directory has not been set");
+  const std::string sys_directory = s_sys_directory + DIR_SEP;
+  ASSERT_MSG(COMMON, !s_sys_directory.empty(), "Sys directory has not been set");
 #else
   const std::string sys_directory = SYSDATA_DIR DIR_SEP;
 #endif
@@ -798,15 +799,15 @@ const std::string& GetSysDirectory()
   return sys_directory;
 }
 
-#ifdef ANDROID
 void SetSysDirectory(const std::string& path)
 {
   INFO_LOG_FMT(COMMON, "Setting Sys directory to {}", path);
-  ASSERT_MSG(COMMON, s_android_sys_directory.empty(), "Sys directory already set to {}",
-             s_android_sys_directory);
-  s_android_sys_directory = path;
+  ASSERT_MSG(COMMON, s_sys_directory.empty(), "Sys directory already set to {}",
+             s_sys_directory);
+  s_sys_directory = path;
 }
 
+#ifdef ANDROID
 void SetGpuDriverDirectories(const std::string& path, const std::string& lib_path)
 {
   INFO_LOG_FMT(COMMON, "Setting Driver directory to {} and library path to {}", path, lib_path);

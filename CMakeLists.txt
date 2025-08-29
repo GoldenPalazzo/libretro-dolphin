@@ -1,4 +1,9 @@
 ########################################
+# Compile commands for IDE integration
+#
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+########################################
 # General setup
 #
 cmake_minimum_required(VERSION 3.13)

@@ -229,9 +229,13 @@ if(ANDROID)
     MemArenaAndroid.cpp
   )
 elseif(WIN32)
+	if(MSVC)
   target_sources(common PRIVATE
     LdrWatcher.cpp
     LdrWatcher.h
+	)
+	endif()
+	target_sources(common PRIVATE
     Logging/ConsoleListenerWin.cpp
     MemArenaWin.cpp
   )
@@ -289,7 +293,7 @@ if(ENABLE_EGL AND EGL_FOUND)
     GL/GLInterface/EGL.cpp
     GL/GLInterface/EGL.h
   )
-  if(ANDROID)
+	if(ANDROID AND NOT LIBRETRO)
     target_sources(common PRIVATE
       GL/GLInterface/EGLAndroid.cpp
       GL/GLInterface/EGLAndroid.h
@@ -306,13 +310,17 @@ endif()
 
 if(WIN32)
   target_sources(common PRIVATE
-    CompatPatches.cpp
     GL/GLInterface/WGL.cpp
     GL/GLInterface/WGL.h
     WindowsDevice.cpp
     WindowsDevice.h
     WindowsRegistry.cpp
   )
+	if(MSVC)
+		target_sources(common PRIVATE
+			CompatPatches.cpp
+		)
+	endif()
 elseif(APPLE)
   target_sources(common PRIVATE
     GL/GLInterface/AGL.h
@@ -374,7 +382,7 @@ if(ENABLE_LLVM)
   endif()
 endif()
 
-if(UNIX)
+if(UNIX AND NOT LIBRETRO)
   # Posix networking code needs to be fixed for Windows
   add_executable(traversal_server TraversalServer.cpp)
   target_link_libraries(traversal_server PRIVATE common fmt::fmt)
@@ -392,8 +400,13 @@ elseif(WIN32)
     "${CMAKE_CURRENT_SOURCE_DIR}/build_info.txt.in"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/build_info.txt"
     )
-
-  target_link_libraries(common PRIVATE "-INCLUDE:enableCompatPatches")
+  if(MSVC)
+		target_link_libraries(common PRIVATE "-INCLUDE:enableCompatPatches")
+		target_link_libraries(common PRIVATE "-NODEFAULTLIB:libcmt")
+	endif()
+	if(MINGW)
+		target_link_libraries(common PRIVATE comctl32 cmdlg32 winmm shlwapi)
+	endif()
 endif()
 
 if(MSVC)

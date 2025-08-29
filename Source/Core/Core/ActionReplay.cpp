@@ -122,6 +122,8 @@ void ApplyCodes(std::span<const ARCode> codes, const std::string& game_id, u16 r
   std::lock_guard guard(s_lock);
   s_disable_logging = false;
   s_active_codes.clear();
+  //TODO: this function differs from Libretro's since there wasn't AchievementManager
+  //probably need a fix, idk
   std::copy_if(codes.begin(), codes.end(), std::back_inserter(s_active_codes),
                [&game_id, &revision](const ARCode& code) {
                  return code.enabled && AchievementManager::GetInstance().CheckApprovedARCode(

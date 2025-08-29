@@ -27,6 +27,7 @@ public:
     FILE_LISTENER = 0,
     CONSOLE_LISTENER,
     LOG_WINDOW_LISTENER,
+    CUSTOM_LISTENER, // Libretro
 
     NUMBER_OF_LISTENERS  // Must be last
   };
