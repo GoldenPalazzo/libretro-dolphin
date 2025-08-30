@@ -29,7 +29,7 @@ namespace Core
 {
 enum class NetworkCaptureType
 {
-  None,
+  NoneCapture,
   Raw,
   PCAP,
 };
