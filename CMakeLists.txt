@@ -497,7 +497,7 @@ if(LIBRETRO)
 	set(ENABLE_FRAMEDUMPS 0)
 	set(ENABLE_QT 0)
 	add_definitions(-D__LIBRETRO__)
-	check_and_add_flag(FPIC -dpic)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 if(ENABLE_HEADLESS)

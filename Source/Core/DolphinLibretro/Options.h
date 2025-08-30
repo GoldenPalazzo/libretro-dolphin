@@ -30,7 +30,7 @@ public:
   Option(const char* id, const char* name, T first, int count, int step = 1);
   Option(const char* id, const char* name, bool initial);
 
-  bool Updated()
+  bool Updated() const
   {
     if (m_dirty)
     {
@@ -60,7 +60,7 @@ public:
     return false;
   }
 
-  operator T()
+  operator T() const
   {
     Updated();
     return m_value;
@@ -83,8 +83,8 @@ private:
 
   const char* m_id;
   const char* m_name;
-  T m_value;
-  bool m_dirty = true;
+  mutable T m_value;
+  mutable bool m_dirty = true;
   std::string m_options;
   std::vector<std::pair<std::string, T>> m_list;
 };
@@ -98,11 +98,11 @@ extern Option<bool> waitForShaders;
 extern Option<bool> progressiveScan;
 extern Option<bool> pal60;
 extern Option<int> antiAliasing;
-extern Option<int> maxAnisotropy;
+extern Option<AnisotropicFilteringMode> maxAnisotropy;
 extern Option<bool> skipDupeFrames;
 extern Option<bool> immediatexfb;
 extern Option<bool> efbScaledCopy;
-extern Option<bool> forceTextureFiltering;
+extern Option<TextureFilteringMode> forceTextureFiltering;
 extern Option<bool> efbToTexture;
 extern Option<int> textureCacheAccuracy;
 extern Option<bool> gpuTextureDecoding;
