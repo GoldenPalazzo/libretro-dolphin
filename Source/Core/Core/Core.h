@@ -144,6 +144,8 @@ bool IsHostThread();
 
 bool WantsDeterminism();
 
+void EmuThread(Core::System& system, WindowSystemInfo wsi);
+
 // [NOT THREADSAFE] For use by Host only
 void SetState(Core::System& system, State state, bool report_state_change = true,
               bool override_achievement_restrictions = false);

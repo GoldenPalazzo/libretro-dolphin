@@ -15,6 +15,8 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include "Common/Config/Config.h"
+#include "VideoCommon/EFBInterface.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -96,6 +98,10 @@ namespace Core
 {
 static bool s_wants_determinism;
 
+static std::thread::id s_gpu_thread_id;
+static std::vector<Common::ScopeGuard> s_emu_thread_scope_guards;
+std::unique_ptr<BootParameters> boot_params;
+
 // Declarations and definitions
 static std::thread s_emu_thread;
 static std::vector<StateChangedCallbackFunc> s_on_state_changed_callbacks;
@@ -128,8 +134,8 @@ static thread_local bool tls_is_cpu_thread = false;
 static thread_local bool tls_is_gpu_thread = false;
 static thread_local bool tls_is_host_thread = false;
 
-static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot,
-                      WindowSystemInfo wsi);
+//static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot,
+                      //WindowSystemInfo wsi);
 
 static Common::EventHook s_frame_presented =
     AfterPresentEvent::Register(&Core::Callback_FramePresented, "Core Frame Presented");
@@ -205,6 +211,7 @@ bool IsCPUThread()
   return tls_is_cpu_thread;
 }
 
+// TODO: check this edit for libretro
 bool IsGPUThread()
 {
   return tls_is_gpu_thread;
@@ -251,7 +258,18 @@ bool Init(Core::System& system, std::unique_ptr<BootParameters> boot, const Wind
 
   // Start the emu thread
   s_state.store(State::Starting);
-  s_emu_thread = std::thread(EmuThread, std::ref(system), std::move(boot), prepared_wsi);
+  //s_emu_thread = std::thread(EmuThread, std::ref(system), std::move(boot), prepared_wsi);
+  boot_params = std::move(boot);
+
+  if (!Config::Get(Config::MAIN_CPU_THREAD))
+    Config::SetCurrent(Config::MAIN_EMU_THREAD, true);
+
+  if (Config::Get(Config::MAIN_EMU_THREAD))
+  {
+    // In single core mode, the emu thread is also the GPU thread.
+    s_emu_thread = std::thread(EmuThread, std::ref(system), prepared_wsi);
+  }
+
   return true;
 }
 
@@ -462,8 +480,7 @@ static void FifoPlayerThread(Core::System& system, const std::optional<std::stri
 // Initialize and create emulation thread
 // Call browser: Init():s_emu_thread().
 // See the BootManager.cpp file description for a complete call schedule.
-static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot,
-                      WindowSystemInfo wsi)
+void EmuThread(Core::System& system, WindowSystemInfo wsi)
 {
   NotifyStateChanged(State::Starting);
   Common::ScopeGuard flag_guard{[] {
@@ -494,7 +511,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
   Pad::LoadGBAConfig();
   Keyboard::LoadConfig();
 
-  BootSessionData boot_session_data = std::move(boot->boot_session_data);
+  BootSessionData boot_session_data = std::move(boot_params->boot_session_data);
   const std::optional<std::string>& savestate_path = boot_session_data.GetSavestatePath();
   const bool delete_savestate =
       boot_session_data.GetDeleteSavestate() == DeleteSavestateAfterBoot::Yes;
@@ -525,7 +542,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
 
   FreeLook::LoadInputConfig();
 
-  system.GetMovie().Init(*boot);
+  system.GetMovie().Init(*boot_params);
   Common::ScopeGuard movie_guard([&system] { system.GetMovie().Shutdown(); });
 
   AudioCommon::InitSoundStream(system);
@@ -550,16 +567,23 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
     system.GetPowerPC().GetDebugInterface().Clear(guard);
   }};
 
-  if (!g_video_backend->Initialize(wsi))
+  bool init_video = !g_efb_interface;
+  if (init_video)
   {
-    PanicAlertFmt("Failed to initialize video backend!");
-    return;
+    if (!g_video_backend->Initialize(wsi))
+    {
+      PanicAlertFmt("Failed to initialize video backend!");
+      return;
+    }
   }
-  Common::ScopeGuard video_guard{[] {
-    // Clear on screen messages that haven't expired
-    OSD::ClearMessages();
+  Common::ScopeGuard video_guard{[init_video] {
+    if (init_video)
+    {
+      // Clear on screen messages that haven't expired
+      OSD::ClearMessages();
 
-    g_video_backend->Shutdown();
+      g_video_backend->Shutdown();
+    }
   }};
 
   if (cpu_info.HTT)
@@ -585,19 +609,19 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
   // Determine the CPU thread function
   void (*cpuThreadFunc)(Core::System& system, const std::optional<std::string>& savestate_path,
                         bool delete_savestate);
-  if (std::holds_alternative<BootParameters::DFF>(boot->parameters))
+  if (std::holds_alternative<BootParameters::DFF>(boot_params->parameters))
     cpuThreadFunc = FifoPlayerThread;
   else
     cpuThreadFunc = CpuThread;
 
   std::optional<DiscIO::Riivolution::SavegameRedirect> savegame_redirect = std::nullopt;
   if (system.IsWii())
-    savegame_redirect = DiscIO::Riivolution::ExtractSavegameRedirect(boot->riivolution_patches);
+    savegame_redirect = DiscIO::Riivolution::ExtractSavegameRedirect(boot_params->riivolution_patches);
 
   {
     ASSERT(IsCPUThread());
     CPUThreadGuard guard(system);
-    if (!CBoot::BootUp(system, guard, std::move(boot)))
+    if (!CBoot::BootUp(system, guard, std::move(boot_params)))
       return;
   }
 
@@ -629,6 +653,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
   UpdateTitle(system);
 
   // ENTER THE VIDEO THREAD LOOP
+  s_gpu_thread_id = std::this_thread::get_id();
   if (system.IsDualCoreMode())
   {
     // This thread, after creating the EmuWindow, spawns a CPU
@@ -640,6 +665,19 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
     // Spawn the CPU thread. The CPU thread will signal the event that boot is complete.
     s_cpu_thread =
         std::thread(cpuThreadFunc, std::ref(system), std::ref(savestate_path), delete_savestate);
+
+    if (!Config::Get(Config::MAIN_EMU_THREAD))
+    {
+      s_emu_thread_scope_guards.push_back(std::move(flag_guard));
+      s_emu_thread_scope_guards.push_back(std::move(movie_guard));
+      s_emu_thread_scope_guards.push_back(std::move(hw_guard));
+      s_emu_thread_scope_guards.push_back(std::move(video_guard));
+      // TODO: seems not needed, investigate further
+      //s_emu_thread_scope_guards.push_back(std::move(controller_guard));
+      s_emu_thread_scope_guards.push_back(std::move(audio_guard));
+      s_emu_thread_scope_guards.push_back(std::move(wiifs_guard));
+      return;
+    }
 
     // become the GPU thread
     system.GetFifo().RunGpuLoop();
@@ -865,6 +903,7 @@ void Callback_NewField(Core::System& system)
 {
   if (s_frame_step)
   {
+#ifndef __LIBRETRO__
     // To ensure that s_stop_frame_step is up to date, wait for the GPU thread queue to empty,
     // since it is may contain a swap event (which will call Callback_FramePresented). This hurts
     // the performance a little, but luckily, performance matters less when using frame stepping.
@@ -873,6 +912,7 @@ void Callback_NewField(Core::System& system)
     // Only stop the frame stepping if a new frame was displayed
     // (as opposed to the previous frame being displayed for another frame).
     if (s_stop_frame_step.load())
+#endif
     {
       s_frame_step = false;
       system.GetCPU().Break();
@@ -881,6 +921,8 @@ void Callback_NewField(Core::System& system)
   }
 
   AchievementManager::GetInstance().DoFrame();
+  if (!Config::Get(Config::MAIN_EMU_THREAD))
+    system.GetFifo().StopGpuLoop();
 }
 
 void UpdateTitle(Core::System& system)
@@ -909,8 +951,23 @@ void Shutdown(Core::System& system)
   // shut down.
   // For more info read "DirectX Graphics Infrastructure (DXGI): Best Practices"
   // on MSDN.
-  if (s_emu_thread.joinable())
-    s_emu_thread.join();
+  if (Config::Get(Config::MAIN_EMU_THREAD))
+  {
+    if (s_emu_thread.joinable())
+      s_emu_thread.join();
+  }
+  else
+  {
+    if (Config::Get(Config::MAIN_CPU_THREAD))
+      s_cpu_thread.join();
+    INFO_LOG_FMT(CONSOLE, "{}", StopMessage(true, "CPU thread joined."));
+#ifdef USE_GDBSTUB
+    INFO_LOG(CONSOLE, "%s", StopMessage(true, "Stopping GDB ...").c_str());
+    gdb_deinit();
+    INFO_LOG(CONSOLE, "%s", StopMessage(true, "GDB stopped.").c_str());
+#endif
+    s_emu_thread_scope_guards.clear();
+  }
 
   // Make sure there's nothing left over in case we're about to exit.
   HostDispatchJobs(system);
