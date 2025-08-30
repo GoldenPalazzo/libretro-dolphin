@@ -88,6 +88,8 @@ public:
   u8*& GetEXRAM() { return m_exram; }
   u8* GetL1Cache() { return m_l1_cache; }
   u8*& GetFakeVMEM() { return m_fake_vmem; }
+  u8* GetContiguousRAM() { return m_contiguous_ram; }
+  u32 GetTotalMemorySize() const { return m_total_memory_size; }
 
   MMIO::Mapping* GetMMIOMapping() const { return m_mmio_mapping.get(); }
 
@@ -175,6 +177,8 @@ private:
   u8* m_exram = nullptr;
   u8* m_l1_cache = nullptr;
   u8* m_fake_vmem = nullptr;
+  u8* m_contiguous_ram = nullptr;
+  u32 m_total_memory_size = 0;
 
   // m_ram_size is the amount allocated by the emulator, whereas m_ram_size_real
   // is what will be reported in lowmem, and thus used by emulated software.

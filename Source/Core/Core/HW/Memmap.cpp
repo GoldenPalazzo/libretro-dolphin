@@ -151,6 +151,14 @@ void MemoryManager::Init()
   m_physical_page_mappings_base = reinterpret_cast<u8*>(m_physical_page_mappings.data());
   m_logical_page_mappings_base = reinterpret_cast<u8*>(m_logical_page_mappings.data());
 
+  m_total_memory_size = mem_size;
+  m_contiguous_ram = (u8*)m_arena.CreateView(0, m_total_memory_size);
+  if (!m_contiguous_ram)
+  {
+    PanicAlertFmt("Memory::Init(): Failed to create contiguous RAM view.");
+    exit(0);
+  }
+
   InitMMIO(wii);
 
   Clear();
@@ -386,6 +394,8 @@ void MemoryManager::ShutdownFastmemArena()
     m_arena.UnmapFromMemoryRegion(base, region.size);
   }
 
+  m_arena.ReleaseView(m_contiguous_ram, m_total_memory_size);
+  m_contiguous_ram = nullptr;
   for (auto& entry : m_logical_mapped_entries)
   {
     m_arena.UnmapFromMemoryRegion(entry.mapped_pointer, entry.mapped_size);
