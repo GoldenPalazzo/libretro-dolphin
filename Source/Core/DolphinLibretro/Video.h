@@ -41,27 +41,28 @@ void WaitForPresentation();
 }  // namespace Vk
 #endif
 
-/* TODO: Software renderer is currently broken, needs to be fixed or removed
+//TODO: Software renderer is currently broken, needs to be fixed or removed
 class SWRenderer : public SW::SWGfx
 {
 public:
   SWRenderer()
-      : SW::SWRenderer(SWOGLWindow::Create(
+      : SW::SWGfx(SWOGLWindow::Create(
             WindowSystemInfo(WindowSystemType::Libretro, nullptr, nullptr, nullptr)))
   {
   }
   void RenderXFBToScreen(const MathUtil::Rectangle<int>& target_rc,
                          const AbstractTexture* source_texture,
-                         const MathUtil::Rectangle<int>& source_rc) override
+                         const MathUtil::Rectangle<int>& source_rc)
   {
     m_texture = static_cast<const SW::SWTexture*>(source_texture);
     m_rc = source_rc;
-    SW::SWGfx::RenderXFBToScreen(target_rc, source_texture, source_rc);
+    SW::SWGfx::ShowImage(source_texture, source_rc);
   }
 
   void PresentBackbuffer() override
   {
-    video_cb(m_texture->GetData(), m_rc.GetWidth(), m_rc.GetHeight(), m_texture->GetWidth() * 4);
+    //TODO: GetData has literally ass-pulled values as parameters, check later
+    video_cb(m_texture->GetData(0, 0), m_rc.GetWidth(), m_rc.GetHeight(), m_texture->GetWidth() * 4);
     UpdateActiveConfig();
   }
 
@@ -69,7 +70,6 @@ private:
   const SW::SWTexture* m_texture;
   MathUtil::Rectangle<int> m_rc;
 };
-*/
 
 class NullRenderer : public Null::NullGfx
 {

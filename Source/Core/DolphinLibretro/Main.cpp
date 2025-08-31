@@ -199,16 +199,13 @@ void retro_run(void)
     system.SetSoundStream(std::make_unique<Libretro::Audio::Stream>());
     AudioCommon::SetSoundStreamRunning(system, true);
 
-    // TODO: Software renderer not working at the moment
-    // Check Source/Core/DolphinLibretro/Video.h
-    //if (Config::Get(Config::MAIN_GFX_BACKEND) == "Software Renderer")
-    //{
-      //g_video_backend->ShutdownShared();
-      //g_renderer.reset();
-      //g_renderer = std::make_unique<Libretro::Video::SWRenderer>();
-    //}
-    //else
-    if (Config::Get(Config::MAIN_GFX_BACKEND) == "Null")
+    if (Config::Get(Config::MAIN_GFX_BACKEND) == "Software Renderer")
+    {
+      g_video_backend->ShutdownShared();
+      g_gfx.reset();
+      g_gfx = std::make_unique<Libretro::Video::SWRenderer>();
+    }
+    else if (Config::Get(Config::MAIN_GFX_BACKEND) == "Null")
     {
       g_gfx.reset();
       //g_renderer.reset();
