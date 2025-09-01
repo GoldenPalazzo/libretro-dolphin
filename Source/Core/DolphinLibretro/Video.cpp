@@ -9,6 +9,7 @@
 #include "VideoBackends/OGL/OGLBoundingBox.h"
 #include "VideoBackends/OGL/OGLPerfQuery.h"
 #include "VideoBackends/OGL/OGLVertexManager.h"
+#include "VideoBackends/OGL/ProgramShaderCache.h"
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/EFBInterface.h"
 #include "VideoCommon/FramebufferManager.h"
@@ -179,20 +180,24 @@ static void ContextReset(void)
     OGL::VideoBackend* ogl = static_cast<OGL::VideoBackend*>(g_video_backend);
     ogl->InitializeGLExtensions(main_gl_context.get());
     ogl->FillBackendInfo(main_gl_context.get());
-    // TODO: This is completely broken, will fix it later
-    g_gfx =
+    auto gfx =
         std::make_unique<OGL::OGLGfx>(std::move(main_gl_context), Libretro::Options::efbScale);
+    OGL::ProgramShaderCache::Init();
+    // golden: this is needed in OGLGfx and gets set in the original Initialize Videobackend
+    //g_sampler_cache = std::make_unique<OGL::SamplerCache>();
 
     auto vertex_manager = std::make_unique<OGL::VertexManager>();
-    auto is_gles = static_cast<OGL::OGLGfx*>(g_gfx.get())->IsGLES();
+    auto is_gles = static_cast<OGL::OGLGfx*>(gfx.get())->IsGLES();
     auto bbox = std::make_unique<OGL::OGLBoundingBox>();
 
-    ogl->InitializeShared(std::move(g_gfx), std::move(vertex_manager),
+    ogl->InitializeShared(std::move(gfx), std::move(vertex_manager),
                          OGL::GetPerfQuery(is_gles), std::move(bbox));
+    return;
   }
-
+#if 0
   WindowSystemInfo wsi(WindowSystemType::Libretro, nullptr, nullptr, nullptr);
   g_video_backend->Initialize(wsi);
+#endif
 }
 
 static void ContextDestroy(void)
