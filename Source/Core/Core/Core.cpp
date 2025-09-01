@@ -395,12 +395,15 @@ static void CpuThread(Core::System& system, const std::optional<std::string>& sa
   s_memory_watcher = std::make_unique<MemoryWatcher>();
 #endif
 
+  // golden: temporarily disabled because it causes crashes
+#if 0
   if (savestate_path)
   {
     ::State::LoadAs(system, *savestate_path);
     if (delete_savestate)
       File::Delete(*savestate_path);
   }
+#endif
 
   // If s_state is Starting, change it to Running. But if it's already been set to Stopping
   // by the host thread, don't change it.
