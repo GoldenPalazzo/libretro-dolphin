@@ -10,6 +10,7 @@
 #include "VideoBackends/OGL/OGLPerfQuery.h"
 #include "VideoBackends/OGL/OGLVertexManager.h"
 #include "VideoBackends/OGL/ProgramShaderCache.h"
+#include "VideoBackends/OGL/SamplerCache.h"
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/EFBInterface.h"
 #include "VideoCommon/FramebufferManager.h"
@@ -184,7 +185,7 @@ static void ContextReset(void)
         std::make_unique<OGL::OGLGfx>(std::move(main_gl_context), Libretro::Options::efbScale);
     OGL::ProgramShaderCache::Init();
     // golden: this is needed in OGLGfx and gets set in the original Initialize Videobackend
-    //g_sampler_cache = std::make_unique<OGL::SamplerCache>();
+    OGL::g_sampler_cache = std::make_unique<OGL::SamplerCache>();
 
     auto vertex_manager = std::make_unique<OGL::VertexManager>();
     auto is_gles = static_cast<OGL::OGLGfx*>(gfx.get())->IsGLES();
