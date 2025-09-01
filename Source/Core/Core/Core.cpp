@@ -249,8 +249,13 @@ bool Init(Core::System& system, std::unique_ptr<BootParameters> boot, const Wind
   INFO_LOG_FMT(BOOT, "Starting core = {} mode", system.IsWii() ? "Wii" : "GameCube");
   INFO_LOG_FMT(BOOT, "CPU Thread separate = {}", system.IsDualCoreMode() ? "Yes" : "No");
 
+  // golden: this function clears the context and fails because it's called with
+  // a WindowSystemInfo::Libretro
+  // temporary hack until I understand the codebase better
+#ifndef __LIBRETRO__
   // Manually reactivate the video backend in case a GameINI overrides the video backend setting.
   VideoBackendBase::PopulateBackendInfo(wsi);
+#endif
 
   // Issue any API calls which must occur on the main thread for the graphics backend.
   WindowSystemInfo prepared_wsi(wsi);
