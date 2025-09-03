@@ -47,3 +47,4 @@ CMakeLists.txt.user
 .cache/
 # Personal usage scripts
 justfile
+.gdbinit
