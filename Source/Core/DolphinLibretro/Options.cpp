@@ -151,13 +151,14 @@ Option<bool> loadCustomTextures("dolphin_load_custom_textures", "Load Custom Tex
 Option<bool> cacheCustomTextures("dolphin_cache_custom_textures", "Prefetch Custom Textures", false);
 Option<PowerPC::CPUCore> cpu_core("dolphin_cpu_core", "CPU Core",
                                   {
-#ifdef _M_X86
+#ifdef _M_X86_64
                                   {"JIT64", PowerPC::CPUCore::JIT64},
 #elif _M_ARM_64
                                   {"JITARM64", PowerPC::CPUCore::JITARM64},
 #endif
-                                  {"Interpreter", PowerPC::CPUCore::Interpreter},
-                                  {"Cached Interpreter", PowerPC::CPUCore::CachedInterpreter}});
+                                  {"Cached Interpreter", PowerPC::CPUCore::CachedInterpreter},
+                                  {"Interpreter", PowerPC::CPUCore::Interpreter}
+                                  });
 Option<float> cpuClockRate("dolphin_cpu_clock_rate", "CPU Clock Rate",
                            {{"100%", 1.0},
                             {"150%", 1.5},
