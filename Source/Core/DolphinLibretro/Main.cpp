@@ -35,6 +35,7 @@
 #include "VideoCommon/VideoBackendBase.h"
 #include "VideoCommon/VideoCommon.h"
 #include "VideoCommon/VideoConfig.h"
+#include "VideoCommon/Widescreen.h"
 
 #ifdef PERF_TEST
 static struct retro_perf_callback perf_cb;
@@ -158,12 +159,9 @@ void retro_get_system_av_info(retro_system_av_info* info)
   info->geometry.max_width   = info->geometry.base_width;
   info->geometry.max_height  = info->geometry.base_height;
 
-  // TODO: IsWideScreen was added as a libretro patch in RenderBase.h
-  // but the file doesn't exist anymore.
-  // Leaving that for the moment
-  //if (g_renderer)
-    //Libretro::widescreen = g_renderer->IsWideScreen() || g_Config.bWidescreenHack;
-  //else if (SConfig::GetInstance().bWii)
+  if (g_widescreen)
+    Libretro::widescreen = g_widescreen->IsGameWidescreen() || g_Config.bWidescreenHack;
+  else if (Core::System::GetInstance().IsWii())
     Libretro::widescreen = Config::Get(Config::SYSCONF_WIDESCREEN);
 
   info->geometry.aspect_ratio = Libretro::widescreen ? 16.0 / 9.0 : 4.0 / 3.0;
@@ -235,7 +233,7 @@ void retro_run(void)
     Libretro::environ_cb(cmd, &info);
   }
 
-  if (Libretro::widescreen != (/*g_renderer->IsWideScreen()*/ false || g_Config.bWidescreenHack))
+  if (Libretro::widescreen != (g_widescreen->IsGameWidescreen() || g_Config.bWidescreenHack))
   {
     retro_system_av_info info;
     retro_get_system_av_info(&info);
