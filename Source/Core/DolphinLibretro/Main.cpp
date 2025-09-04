@@ -13,6 +13,7 @@
 #include "Common/Thread.h"
 #include "Common/Version.h"
 #include "Core/BootManager.h"
+#include "Core/Config/GraphicsSettings.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/Config/SYSCONFSettings.h"
 #include "Core/ConfigManager.h"
@@ -153,8 +154,8 @@ void retro_get_system_info(retro_system_info* info)
 
 void retro_get_system_av_info(retro_system_av_info* info)
 {
-  info->geometry.base_width  = EFB_WIDTH * Libretro::Options::efbScale;
-  info->geometry.base_height = EFB_HEIGHT * Libretro::Options::efbScale;
+  info->geometry.base_width  = EFB_WIDTH * Libretro::Options::internal_resolution;
+  info->geometry.base_height = EFB_HEIGHT * Libretro::Options::internal_resolution;
 
   info->geometry.max_width   = info->geometry.base_width;
   info->geometry.max_height  = info->geometry.base_height;
@@ -182,9 +183,9 @@ void retro_run(void)
 #else
   Common::Log::LogManager::GetInstance()->SetLogLevel(Libretro::Options::logLevel);
 #endif
-  Config::SetCurrent(Config::MAIN_OVERCLOCK, Libretro::Options::cpuClockRate);
-  Config::SetCurrent(Config::MAIN_OVERCLOCK_ENABLE, Libretro::Options::cpuClockRate != 1.0);
-  g_Config.bWidescreenHack = Libretro::Options::WidescreenHack;
+  Config::SetCurrent(Config::MAIN_OVERCLOCK, Libretro::Options::cpu_clock_rate);
+  Config::SetCurrent(Config::MAIN_OVERCLOCK_ENABLE, Libretro::Options::cpu_clock_rate != 1.0);
+  g_Config.bWidescreenHack = Libretro::Options::widescreen_hack;
 
   Libretro::Input::Update();
 
@@ -220,9 +221,10 @@ void retro_run(void)
         ->SetSystemFrameBuffer((GLuint)Libretro::Video::hw_render.get_current_framebuffer());
   }
 
-  if (Libretro::Options::efbScale.Updated())
+  if (Libretro::Options::internal_resolution.Updated())
   {
-    g_Config.iEFBScale = Libretro::Options::efbScale;
+    //g_Config.iEFBScale = Libretro::Options::internal_resolution;
+    Config::SetCurrent(Config::GFX_EFB_SCALE, Libretro::Options::internal_resolution);
 
     unsigned cmd = RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO;
     if (Libretro::Video::hw_render.context_type == RETRO_HW_CONTEXT_DIRECT3D)

@@ -114,7 +114,7 @@ Option<bool>::Option(const char* id, const char* name, bool initial) : m_id(id),
   Register();
 }
 
-Option<std::string> renderer("dolphin_renderer", "Renderer", {"Hardware"
+Option<std::string> backend("dolphin_renderer", "Backend", {"Hardware"
 #if defined(_DEBUG) || defined(DEBUGFAST)
     , "Software", "Null"
 #endif
@@ -130,25 +130,30 @@ Option<int> internal_resolution(
     "4x Native (2560 x 2112) for 1440p",
     "5x Native (3200 x 2640)",
     "6x Native (3840 x 3168) for 4K",
-
+    "7x Native (4480 x 3696)",
+    "8x Native (5120 x 4224) for 5K",
+    "9x Native (5760 x 4752)",
+    "10x Native (6400 x 5280)",
+    "11x Native (7040 x 5808)",
+    "12x Native (7680 x 6336) for 8K"
   }
 );
-Option<bool> widescreen("dolphin_widescreen", "Widescreen (Wii)", true);
-Option<bool> widescreen_hack("dolphin_widescreen_hack", "WideScreen Hack", false);
+Option<bool> widescreen("dolphin_widescreen", "Enable Widescreen (Wii)", true);
+Option<bool> widescreen_hack("dolphin_widescreen_hack", "Widescreen Hack", false);
 Option<ShaderCompilationMode> shader_compilation_mode(
   "dolphin_shader_compilation_mode",
   "Shader Compilation Mode",
   {
-    {"sync", ShaderCompilationMode::Synchronous},
-    {"a-sync Skip Rendering", ShaderCompilationMode::AsynchronousSkipRendering},
-    {"sync UberShaders", ShaderCompilationMode::SynchronousUberShaders},
-    {"a-sync UberShaders", ShaderCompilationMode::AsynchronousUberShaders}
+    {"Synchronous", ShaderCompilationMode::Synchronous},
+    {"Asynchronous Skip Rendering", ShaderCompilationMode::AsynchronousSkipRendering},
+    {"Synchronous Ubershaders", ShaderCompilationMode::SynchronousUberShaders},
+    {"Asynchronous Ubershaders", ShaderCompilationMode::AsynchronousUberShaders}
   }
 );
-Option<bool> wait_for_shaders("dolphin_wait_for_shaders", "Wait for Shaders before Starting", false);
+Option<bool> wait_for_shaders("dolphin_wait_for_shaders", "Compile Shaders Before Starting", false);
 Option<bool> progressive_scan("dolphin_progressive_scan", "Progressive Scan", true);
 Option<bool> use_pal60("dolphin_pal60", "PAL60", true);
-Option<int> antiAliasing(
+Option<int> anti_aliasing(
   "dolphin_anti_aliasing",
   "Anti-Aliasing",
   {
@@ -177,7 +182,7 @@ Option<AnisotropicFilteringMode> max_anisotropy(
   }
 );
 Option<bool> skip_presenting_duplicate_frames("dolphin_skip_dupe_frames", "Skip Presenting Duplicate Frames", true);
-Option<bool> immediately_present_xfb("dolphin_immediate_xfb", "Immediate XFB", false);
+Option<bool> immediately_present_xfb("dolphin_immediate_xfb", "Immediately Present XFB", false);
 Option<bool> scaled_efb_copy("dolphin_efb_scaled_copy", "Scaled EFB Copy", true);
 Option<TextureFilteringMode> texture_filtering(
   "dolphin_force_texture_filtering",
@@ -201,7 +206,7 @@ Option<int> texture_cache_accuracy(
 Option<bool> gpu_texture_decoding("dolphin_gpu_texture_decoding", "GPU Texture Decoding", false);
 Option<bool> fast_depth_calculation("dolphin_fast_depth_calculation", "Fast Depth Calculation", true);
 Option<bool> enable_bounding_box("dolphin_bbox_enabled", "Enabled Bounding Box", false);
-Option<bool> disable_efb_to_vram_copies("dolphin_efb_to_vram", "Disable EFB VRAM copies", false);
+Option<bool> disable_efb_to_vram_copies("dolphin_efb_to_vram", "Disable EFB to VRAM Copies", false);
 //Option<bool> loadCustomTextures("dolphin_load_custom_textures", "Load Custom Textures", false);
 //Option<bool> cacheCustomTextures("dolphin_cache_custom_textures", "Prefetch Custom Textures", false);
 Option<PowerPC::CPUCore> cpu_core(

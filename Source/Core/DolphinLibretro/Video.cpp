@@ -74,8 +74,8 @@ public:
   }
   virtual bool Initialize(const WindowSystemInfo& wsi, bool stereo, bool core) override
   {
-    m_backbuffer_width = EFB_WIDTH * Libretro::Options::efbScale;
-    m_backbuffer_height = EFB_HEIGHT * Libretro::Options::efbScale;
+    m_backbuffer_width = EFB_WIDTH * Libretro::Options::internal_resolution;
+    m_backbuffer_height = EFB_HEIGHT * Libretro::Options::internal_resolution;
     switch (Libretro::Video::hw_render.context_type)
     {
     case RETRO_HW_CONTEXT_OPENGLES3:
@@ -385,7 +385,7 @@ static bool SetHWRender(retro_hw_context_type type)
 }
 void Init()
 {
-  if (Options::renderer == "Hardware")
+  if (Options::backend == "Hardware")
   {
     retro_hw_context_type preferred = RETRO_HW_CONTEXT_NONE;
     if (environ_cb(RETRO_ENVIRONMENT_GET_PREFERRED_HW_RENDER, &preferred) && SetHWRender(preferred))
@@ -406,7 +406,7 @@ void Init()
 #endif
   }
   hw_render.context_type = RETRO_HW_CONTEXT_NONE;
-  if (Options::renderer == "Software")
+  if (Options::backend == "Software")
     Config::SetBase(Config::MAIN_GFX_BACKEND, "Software Renderer");
   else
     Config::SetBase(Config::MAIN_GFX_BACKEND, "Null");

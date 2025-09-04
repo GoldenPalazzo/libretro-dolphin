@@ -118,7 +118,7 @@ bool retro_load_game(const struct retro_game_info* game)
   Config::SetBase(Config::SYSCONF_WIIMOTE_MOTOR, Libretro::Options::enableRumble);
 
   Config::SetBase(Config::GFX_WIDESCREEN_HACK, Libretro::Options::widescreen_hack);
-  Config::SetBase(Config::GFX_EFB_SCALE, Libretro::Options::scaled_efb_copy);
+  Config::SetBase(Config::GFX_EFB_SCALE, Libretro::Options::internal_resolution);
   Config::SetBase(Config::GFX_ASPECT_RATIO, AspectMode::Stretch);
   Config::SetBase(Config::GFX_BACKEND_MULTITHREADING, false);
   Config::SetBase(Config::GFX_SHADER_COMPILATION_MODE, Libretro::Options::shader_compilation_mode);
