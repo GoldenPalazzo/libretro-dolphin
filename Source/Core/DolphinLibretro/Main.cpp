@@ -71,7 +71,7 @@ static unsigned int GetSampleRate()
 {
   auto& system = Core::System::GetInstance();
   SoundStream* sound_stream = system.GetSoundStream();
-  if (sound_stream)
+  if (sound_stream && sound_stream->GetMixer()->GetSampleRate() != 0)
     return sound_stream->GetMixer()->GetSampleRate();
   else if (system.IsWii())
     return Options::audioMixerRate;
@@ -84,7 +84,10 @@ static unsigned int GetSampleRate()
 class Stream final : public SoundStream
 {
 public:
-  Stream() : SoundStream(GetSampleRate()) {}
+  Stream()
+  {
+    m_mixer = std::make_unique<Mixer>(GetSampleRate());
+  }
   bool SetRunning(bool running) override { return running; }
   void Update(unsigned int num_samples) override
   {
@@ -102,7 +105,7 @@ public:
   }
 
 private:
-  static constexpr unsigned int MAX_SAMPLES = 1024;
+  static constexpr unsigned int MAX_SAMPLES = 512;
   s16 m_buffer[MAX_SAMPLES * 2];
 };
 

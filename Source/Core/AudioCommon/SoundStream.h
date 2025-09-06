@@ -14,7 +14,7 @@ protected:
   std::unique_ptr<Mixer> m_mixer;
 
 public:
-  SoundStream(unsigned int sample_rate = 48000) : m_mixer(new Mixer(sample_rate)) {}
+  SoundStream() : m_mixer(new Mixer(48000)) {}
   virtual ~SoundStream() {}
   static bool IsValid() { return false; }
   Mixer* GetMixer() const { return m_mixer.get(); }

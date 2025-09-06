@@ -100,7 +100,7 @@ bool retro_load_game(const struct retro_game_info* game)
   SConfig::GetInstance().bBootToPause = true;
   Config::SetCurrent(Config::MAIN_OVERCLOCK, Libretro::Options::cpu_clock_rate);
   Config::SetCurrent(Config::MAIN_OVERCLOCK_ENABLE, Libretro::Options::cpu_clock_rate != 1.0);
-  Config::SetCurrent(Config::MAIN_AUDIO_BACKEND, "null");
+  Config::SetCurrent(Config::MAIN_AUDIO_BACKEND, BACKEND_NULLSOUND);
   Config::SetCurrent(Config::MAIN_DUMP_AUDIO, false);
   Config::SetCurrent(Config::MAIN_DPL2_DECODER, false);
   Config::SetCurrent(Config::MAIN_AUDIO_LATENCY, 0);
