@@ -13,6 +13,7 @@
 #include "AudioCommon/OpenALStream.h"
 #include "AudioCommon/OpenSLESStream.h"
 #include "AudioCommon/PulseAudioStream.h"
+#include "AudioCommon/SoundStream.h"
 #include "AudioCommon/WASAPIStream.h"
 #include "Common/FileUtil.h"
 #include "Common/Logging/Log.h"
@@ -210,6 +211,10 @@ void SendAIBuffer(Core::System& system, const short* samples, unsigned int num_s
   {
     mixer->PushSamples(samples, num_samples);
   }
+
+#ifdef __LIBRETRO__
+  const_cast<SoundStream*>(sound_stream)->Update(num_samples);
+#endif
 }
 
 void StartAudioDump(Core::System& system)

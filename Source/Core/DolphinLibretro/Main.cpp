@@ -86,26 +86,23 @@ class Stream final : public SoundStream
 public:
   Stream() : SoundStream(GetSampleRate()) {}
   bool SetRunning(bool running) override { return running; }
-  // TODO: this was an override... fix it later if needed
-  void Update() // override
+  void Update(unsigned int num_samples) override
   {
-    //unsigned int available = m_mixer->AvailableSamples();
-    unsigned int available = 0; // TODO: There is no AvailableSamples anymore, fix later
-    while (available > MAX_SAMPLES)
+    while (num_samples > MAX_SAMPLES)
     {
       m_mixer->Mix(m_buffer, MAX_SAMPLES);
       batch_cb(m_buffer, MAX_SAMPLES);
-      available -= MAX_SAMPLES;
+      num_samples -= MAX_SAMPLES;
     }
-    if (available)
+    if (num_samples)
     {
-      m_mixer->Mix(m_buffer, available);
-      batch_cb(m_buffer, available);
+      m_mixer->Mix(m_buffer, num_samples);
+      batch_cb(m_buffer, num_samples);
     }
   }
 
 private:
-  static constexpr unsigned int MAX_SAMPLES = 512;
+  static constexpr unsigned int MAX_SAMPLES = 1024;
   s16 m_buffer[MAX_SAMPLES * 2];
 };
 
