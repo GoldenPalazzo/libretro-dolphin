@@ -182,7 +182,7 @@ static void ContextReset(void)
     ogl->InitializeGLExtensions(main_gl_context.get());
     ogl->FillBackendInfo(main_gl_context.get());
     auto gfx =
-        std::make_unique<OGL::OGLGfx>(std::move(main_gl_context), Libretro::Options::efbScale);
+        std::make_unique<OGL::OGLGfx>(std::move(main_gl_context), Libretro::Options::internal_resolution);
     OGL::ProgramShaderCache::Init();
     // golden: this is needed in OGLGfx and gets set in the original Initialize Videobackend
     OGL::g_sampler_cache = std::make_unique<OGL::SamplerCache>();
