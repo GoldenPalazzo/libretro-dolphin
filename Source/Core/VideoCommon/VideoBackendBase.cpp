@@ -286,12 +286,10 @@ bool VideoBackendBase::InitializeShared(std::unique_ptr<AbstractGfx> gfx,
                                         std::unique_ptr<EFBInterfaceBase> efb_interface,
                                         std::unique_ptr<TextureCacheBase> texture_cache)
 {
+
   memset(reinterpret_cast<u8*>(&g_main_cp_state), 0, sizeof(g_main_cp_state));
   memset(reinterpret_cast<u8*>(&g_preprocess_cp_state), 0, sizeof(g_preprocess_cp_state));
   s_tex_mem.fill(0);
-
-  // do not initialize again for the config window
-  m_initialized = true;
 
   g_gfx = std::move(gfx);
   g_vertex_manager = std::move(vertex_manager);
@@ -319,6 +317,15 @@ bool VideoBackendBase::InitializeShared(std::unique_ptr<AbstractGfx> gfx,
     Shutdown();
     return false;
   }
+
+  if (m_initialized)
+  {
+    VertexLoaderManager::Init();
+    return true;
+  }
+
+  // do not initialize again for the config window
+  m_initialized = true;
 
   auto& system = Core::System::GetInstance();
   auto& command_processor = system.GetCommandProcessor();
@@ -351,6 +358,7 @@ bool VideoBackendBase::InitializeShared(std::unique_ptr<AbstractGfx> gfx,
 void VideoBackendBase::ShutdownShared()
 {
   auto& system = Core::System::GetInstance();
+
   system.GetCustomResourceManager().Shutdown();
 
   g_frame_dumper.reset();
@@ -371,6 +379,12 @@ void VideoBackendBase::ShutdownShared()
   g_efb_interface.reset();
   g_widescreen.reset();
   g_gfx.reset();
+
+  if (Core::IsRunning(system))
+  {
+    VertexLoaderManager::Clear();
+    return;
+  }
 
   m_initialized = false;
 
