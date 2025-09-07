@@ -13,6 +13,7 @@
 
 #include "VideoCommon/DriverDetails.h"
 #include "VideoCommon/VideoCommon.h"
+#include "vulkan/vulkan_core.h"
 
 namespace Vulkan
 {
@@ -124,8 +125,15 @@ VkPhysicalDeviceFeatures VulkanContext::PhysicalDeviceInfo::features() const
   return features;
 }
 
+#ifdef __LIBRETRO__
+VulkanContext::VulkanContext(VkInstance instance, VkPhysicalDevice physical_device,
+                            VkSurfaceKHR surface)
+      : m_instance(instance), m_physical_device(physical_device), m_surface(surface),
+        m_device_info(physical_device)
+#else
 VulkanContext::VulkanContext(VkInstance instance, VkPhysicalDevice physical_device)
     : m_instance(instance), m_physical_device(physical_device), m_device_info(physical_device)
+#endif
 {
 }
 
@@ -135,6 +143,8 @@ VulkanContext::~VulkanContext()
     vmaDestroyAllocator(m_allocator);
   if (m_device != VK_NULL_HANDLE)
     vkDestroyDevice(m_device, nullptr);
+  if (m_surface != VK_NULL_HANDLE)
+    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 
   if (m_debug_utils_messenger != VK_NULL_HANDLE)
     DisableDebugUtils();
@@ -589,7 +599,7 @@ std::unique_ptr<VulkanContext> VulkanContext::Create(VkInstance instance, VkPhys
                                                      bool enable_validation_layer,
                                                      u32 vk_api_version)
 {
-  std::unique_ptr<VulkanContext> context = std::make_unique<VulkanContext>(instance, gpu);
+  std::unique_ptr<VulkanContext> context = std::make_unique<VulkanContext>(instance, gpu, surface);
 
   // Initialize DriverDetails so that we can check for bugs to disable features if needed.
   context->InitDriverDetails();
@@ -599,17 +609,22 @@ std::unique_ptr<VulkanContext> VulkanContext::Create(VkInstance instance, VkPhys
     context->EnableDebugUtils();
 
   // Attempt to create the device.
+#ifdef __LIBRETRO__
+  if (!context->CreateDevice(enable_validation_layer) ||
+      !context->CreateAllocator(vk_api_version))
+  {
+#else
   if (!context->CreateDevice(surface, enable_validation_layer) ||
       !context->CreateAllocator(vk_api_version))
   {
     // Since we are destroying the instance, we're also responsible for destroying the surface.
     if (surface != VK_NULL_HANDLE)
       vkDestroySurfaceKHR(instance, surface, nullptr);
-
+#endif
     return nullptr;
   }
 
-  return context;
+ return context;
 }
 
 bool VulkanContext::SelectDeviceExtensions(bool enable_surface)
@@ -688,8 +703,16 @@ void VulkanContext::WarnMissingDeviceFeatures()
   }
 }
 
+#ifdef __LIBRETRO__
+bool VulkanContext::CreateDevice(bool enable_validation_layer)
+#else
 bool VulkanContext::CreateDevice(VkSurfaceKHR surface, bool enable_validation_layer)
+#endif
 {
+#ifdef __LIBRETRO__
+  VkSurfaceKHR surface = m_surface;
+#endif
+
   u32 queue_family_count;
   vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &queue_family_count, nullptr);
   if (queue_family_count == 0)
@@ -1043,6 +1066,14 @@ void VulkanContext::InitDriverDetails()
   {
     vendor = DriverDetails::VENDOR_APPLE;
     driver = DriverDetails::DRIVER_PORTABILITY;
+  }
+  else if (vendor_id == 0x14E4 || device_name.find("V3D") != std::string::npos) // golden: reduced
+                                                                                // to V3D from V3d
+                                                                                // 4.2
+  {
+    // Supported by the videocore IV found in the RPI4 and upwards.
+    vendor = DriverDetails::VENDOR_MESA;
+    driver = DriverDetails::DRIVER_V3D;
   }
   else
   {

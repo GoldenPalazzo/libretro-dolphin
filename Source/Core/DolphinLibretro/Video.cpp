@@ -11,9 +11,11 @@
 #include "VideoBackends/OGL/OGLVertexManager.h"
 #include "VideoBackends/OGL/ProgramShaderCache.h"
 #include "VideoBackends/OGL/SamplerCache.h"
+#include "VideoBackends/Vulkan/VulkanLoader.h"
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/EFBInterface.h"
 #include "VideoCommon/FramebufferManager.h"
+#include "vulkan/vulkan_core.h"
 
 #ifdef _WIN32
 #define HAVE_D3D11
@@ -124,8 +126,8 @@ static void ContextReset(void)
       return;
     }
     Vk::SetHWRenderInterface(vulkan);
-    Vk::SetSurfaceSize(EFB_WIDTH * Libretro::Options::efbScale,
-                       EFB_HEIGHT * Libretro::Options::efbScale);
+    Vk::SetSurfaceSize(EFB_WIDTH * Libretro::Options::internal_resolution,
+                       EFB_HEIGHT * Libretro::Options::internal_resolution);
   }
 #endif
 #ifdef _WIN32
@@ -195,10 +197,8 @@ static void ContextReset(void)
                          OGL::GetPerfQuery(is_gles), std::move(bbox));
     return;
   }
-#if 0
   WindowSystemInfo wsi(WindowSystemType::Libretro, nullptr, nullptr, nullptr);
   g_video_backend->Initialize(wsi);
-#endif
 }
 
 static void ContextDestroy(void)
@@ -259,6 +259,22 @@ static const VkApplicationInfo* GetApplicationInfo(void)
   return &app_info;
 }
 
+static u32 GetApiVersion()
+{
+  if (Vulkan::LoadVulkanLibrary())
+  {
+    u32 version = 0;
+    VkInstance temp = Vulkan::VulkanContext::CreateVulkanInstance(WindowSystemType::Headless,
+          false, false, &version);
+    if (temp != VK_NULL_HANDLE)
+    {
+      vkDestroyInstance(temp, nullptr);
+      return version;
+    }
+  }
+  return VK_API_VERSION_1_0;
+}
+
 static bool CreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysicalDevice gpu,
                          VkSurfaceKHR surface, PFN_vkGetInstanceProcAddr get_instance_proc_addr,
                          const char** required_device_extensions,
@@ -289,13 +305,13 @@ static bool CreateDevice(retro_vulkan_context* context, VkInstance instance, VkP
     return false;
   }
 
-  Vulkan::VulkanContext::PopulateBackendInfo(&g_Config);
-  Vulkan::VulkanContext::PopulateBackendInfoAdapters(&g_Config, gpu_list);
+  Vulkan::VulkanContext::PopulateBackendInfo(&g_backend_info);
+  Vulkan::VulkanContext::PopulateBackendInfoAdapters(&g_backend_info, gpu_list);
 
   if (gpu == VK_NULL_HANDLE)
     gpu = gpu_list[0];
 
-  Vulkan::g_vulkan_context = Vulkan::VulkanContext::Create(instance, gpu, surface, false, false);
+  Vulkan::g_vulkan_context = Vulkan::VulkanContext::Create(instance, gpu, surface, false, false, VK_API_VERSION_1_2); // golden: hardcoded for the moment
   if (!Vulkan::g_vulkan_context)
   {
     ERROR_LOG_FMT(VIDEO, "Failed to create Vulkan device");

@@ -12,6 +12,7 @@
 #include "Common/WindowSystemInfo.h"
 #include "VideoBackends/Vulkan/Constants.h"
 #include "VideoCommon/VideoConfig.h"
+#include "vulkan/vulkan_core.h"
 
 namespace Vulkan
 {
@@ -56,7 +57,11 @@ public:
     bool shaderSubgroupOperations = false;
   };
 
+#ifdef __LIBRETRO__
+  VulkanContext(VkInstance instance, VkPhysicalDevice physical_device, VkSurfaceKHR surface);
+#else
   VulkanContext(VkInstance instance, VkPhysicalDevice physical_device);
+#endif
   ~VulkanContext();
 
   // Determines if the Vulkan validation layer is available on the system.
@@ -94,6 +99,7 @@ public:
   VkInstance GetVulkanInstance() const { return m_instance; }
   VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; }
   VkDevice GetDevice() const { return m_device; }
+  VkSurfaceKHR GetSurface() const { return m_surface; }
   VkQueue GetGraphicsQueue() const { return m_graphics_queue; }
   u32 GetGraphicsQueueFamilyIndex() const { return m_graphics_queue_family_index; }
   VkQueue GetPresentQueue() const { return m_present_queue; }
@@ -137,7 +143,11 @@ private:
                                        bool validation_layer_enabled);
   bool SelectDeviceExtensions(bool enable_surface);
   void WarnMissingDeviceFeatures();
+#ifdef __LIBRETRO__
+  bool CreateDevice(bool enable_validation_layer);
+#else
   bool CreateDevice(VkSurfaceKHR surface, bool enable_validation_layer);
+#endif
   void InitDriverDetails();
   bool CreateAllocator(u32 vk_api_version);
 
@@ -145,6 +155,9 @@ private:
   VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
   VkDevice m_device = VK_NULL_HANDLE;
   VmaAllocator m_allocator = VK_NULL_HANDLE;
+#ifdef __LIBRETRO__
+  VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+#endif
 
   VkQueue m_graphics_queue = VK_NULL_HANDLE;
   u32 m_graphics_queue_family_index = 0;

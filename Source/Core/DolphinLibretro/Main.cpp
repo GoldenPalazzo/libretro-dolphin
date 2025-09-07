@@ -200,14 +200,12 @@ void retro_run(void)
 
     if (Config::Get(Config::MAIN_GFX_BACKEND) == "Software Renderer")
     {
-      g_video_backend->ShutdownShared();
       g_gfx.reset();
       g_gfx = std::make_unique<Libretro::Video::SWRenderer>();
     }
     else if (Config::Get(Config::MAIN_GFX_BACKEND) == "Null")
     {
       g_gfx.reset();
-      //g_renderer.reset();
       g_gfx = std::make_unique<Libretro::Video::NullRenderer>();
     }
 

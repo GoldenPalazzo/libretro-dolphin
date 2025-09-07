@@ -1,3 +1,29 @@
+/* Copyright (C) 2010-2016 The RetroArch team
+ *
+ * ---------------------------------------------------------------------------------------------
+ * The following license statement only applies to this libretro API header (libretro_vulkan.h)
+ * ---------------------------------------------------------------------------------------------
+ *
+ * Permission is hereby granted, free of charge,
+ * to any person obtaining a copy of this software and associated documentation files (the
+ * "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 #ifndef LIBRETRO_VULKAN_H__
 #define LIBRETRO_VULKAN_H__
 
@@ -11,7 +37,7 @@ struct retro_vulkan_image
 {
   VkImageView image_view;
   VkImageLayout image_layout;
-  VkImageViewCreateInfo image_view_create_info;
+  VkImageViewCreateInfo create_info;
 };
 
 typedef void (*retro_vulkan_set_image_t)(void* handle, const struct retro_vulkan_image* image,
@@ -28,6 +54,32 @@ typedef void (*retro_vulkan_unlock_queue_t)(void* handle);
 typedef void (*retro_vulkan_set_signal_semaphore_t)(void* handle, VkSemaphore semaphore);
 
 typedef const VkApplicationInfo* (*retro_vulkan_get_application_info_t)(void);
+
+struct retro_vulkan_context
+{
+  VkPhysicalDevice gpu;
+  VkDevice device;
+  VkQueue queue;
+  uint32_t queue_family_index;
+  VkQueue presentation_queue;
+  uint32_t presentation_queue_family_index;
+};
+
+typedef bool (*retro_vulkan_create_device_t)(
+    struct retro_vulkan_context* context, VkInstance instance, VkPhysicalDevice gpu,
+    VkSurfaceKHR surface, PFN_vkGetInstanceProcAddr get_instance_proc_addr,
+    const char** required_device_extensions, unsigned num_required_device_extensions,
+    const char** required_device_layers, unsigned num_required_device_layers,
+    const VkPhysicalDeviceFeatures* required_features);
+
+typedef void (*retro_vulkan_destroy_device_t)(void);
+
+/* Note on thread safety:
+ * The Vulkan API is heavily designed around multi-threading, and
+ * the libretro interface for it should also be threading friendly.
+ * A core should be able to build command buffers and submit
+ * command buffers to the GPU from any thread.
+ */
 
 struct retro_hw_render_context_negotiation_interface_vulkan
 {

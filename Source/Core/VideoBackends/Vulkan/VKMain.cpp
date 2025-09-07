@@ -90,6 +90,12 @@ static bool ShouldEnableDebugUtils(bool enable_validation_layers)
 
 bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
 {
+
+  bool enable_surface = wsi.type != WindowSystemType::Headless;
+#ifdef __LIBRETRO__
+  if (!g_vulkan_context)
+  {
+#endif
   if (!LoadVulkanLibrary())
   {
     PanicAlertFmt("Failed to load Vulkan library.");
@@ -106,7 +112,6 @@ bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
 
   // Create Vulkan instance, needed before we can create a surface, or enumerate devices.
   // We use this instance to fill in backend info, then re-use it for the actual device.
-  bool enable_surface = wsi.type != WindowSystemType::Headless;
   bool enable_debug_utils = ShouldEnableDebugUtils(enable_validation_layer);
   u32 vk_api_version = 0;
   VkInstance instance = VulkanContext::CreateVulkanInstance(
@@ -175,6 +180,10 @@ bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
     UnloadVulkanLibrary();
     return false;
   }
+#ifdef __LIBRETRO__
+  }
+  VkSurfaceKHR surface = g_vulkan_context->GetSurface();
+#endif
 
   // Since VulkanContext maintains a copy of the device features and properties, we can use this
   // to initialize the backend information, so that we don't need to enumerate everything again.
