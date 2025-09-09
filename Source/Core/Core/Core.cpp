@@ -638,9 +638,11 @@ void EmuThread(Core::System& system, WindowSystemInfo wsi)
   // Initialise Wii filesystem contents.
   // This is done here after Boot and not in BootManager to ensure that we operate
   // with the correct title context since save copying requires title directories to exist.
-  Common::ScopeGuard wiifs_guard{[&boot_session_data] {
-    Core::CleanUpWiiFileSystemContents(boot_session_data);
-    boot_session_data.InvokeWiiSyncCleanup();
+  auto bsd_ptr = std::make_shared<BootSessionData>(std::move(boot_session_data));
+  Common::ScopeGuard wiifs_guard{
+    [bsd_ptr]() {
+      Core::CleanUpWiiFileSystemContents(*bsd_ptr);
+      bsd_ptr->InvokeWiiSyncCleanup();
   }};
   if (system.IsWii())
     Core::InitializeWiiFileSystemContents(savegame_redirect, boot_session_data);
@@ -961,14 +963,18 @@ void Shutdown(Core::System& system)
   // shut down.
   // For more info read "DirectX Graphics Infrastructure (DXGI): Best Practices"
   // on MSDN.
+#ifndef __LIBRETRO__
   if (Config::Get(Config::MAIN_EMU_THREAD))
+#endif
   {
     if (s_emu_thread.joinable())
       s_emu_thread.join();
+#ifndef __LIBRETRO__
   }
   else
   {
-    if (Config::Get(Config::MAIN_CPU_THREAD))
+#endif
+    if (Config::Get(Config::MAIN_CPU_THREAD) && s_cpu_thread.joinable())
       s_cpu_thread.join();
     INFO_LOG_FMT(CONSOLE, "{}", StopMessage(true, "CPU thread joined."));
 #ifdef USE_GDBSTUB

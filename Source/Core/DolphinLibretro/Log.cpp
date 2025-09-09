@@ -58,9 +58,12 @@ LogListener::LogListener(retro_log_printf_t log) : m_log(log)
 
 LogListener::~LogListener()
 {
-  Common::Log::LogManager::GetInstance()->EnableListener(LogListener::CUSTOM_LISTENER, false);
-  Common::Log::LogManager::GetInstance()->EnableListener(LogListener::CONSOLE_LISTENER, true);
-  Common::Log::LogManager::GetInstance()->RegisterListener(LogListener::CONSOLE_LISTENER, nullptr);
+  auto* instance = Common::Log::LogManager::GetInstance();
+  if (!instance)
+    return;
+  instance->EnableListener(LogListener::CUSTOM_LISTENER, false);
+  instance->EnableListener(LogListener::CONSOLE_LISTENER, true);
+  instance->RegisterListener(LogListener::CONSOLE_LISTENER, nullptr);
 }
 
 void LogListener::Log(Common::Log::LogLevel level, const char* text)
