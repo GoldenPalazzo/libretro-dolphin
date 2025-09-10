@@ -259,22 +259,6 @@ static const VkApplicationInfo* GetApplicationInfo(void)
   return &app_info;
 }
 
-static u32 GetApiVersion()
-{
-  if (Vulkan::LoadVulkanLibrary())
-  {
-    u32 version = 0;
-    VkInstance temp = Vulkan::VulkanContext::CreateVulkanInstance(WindowSystemType::Headless,
-          false, false, &version);
-    if (temp != VK_NULL_HANDLE)
-    {
-      vkDestroyInstance(temp, nullptr);
-      return version;
-    }
-  }
-  return VK_API_VERSION_1_0;
-}
-
 static bool CreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysicalDevice gpu,
                          VkSurfaceKHR surface, PFN_vkGetInstanceProcAddr get_instance_proc_addr,
                          const char** required_device_extensions,
