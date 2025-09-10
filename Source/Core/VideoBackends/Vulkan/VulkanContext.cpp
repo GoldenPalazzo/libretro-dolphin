@@ -143,8 +143,10 @@ VulkanContext::~VulkanContext()
     vmaDestroyAllocator(m_allocator);
   if (m_device != VK_NULL_HANDLE)
     vkDestroyDevice(m_device, nullptr);
+#ifdef __LIBRETRO__
   if (m_surface != VK_NULL_HANDLE)
     vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+#endif
 
   if (m_debug_utils_messenger != VK_NULL_HANDLE)
     DisableDebugUtils();
@@ -599,7 +601,11 @@ std::unique_ptr<VulkanContext> VulkanContext::Create(VkInstance instance, VkPhys
                                                      bool enable_validation_layer,
                                                      u32 vk_api_version)
 {
+#ifdef __LIBRETRO__
   std::unique_ptr<VulkanContext> context = std::make_unique<VulkanContext>(instance, gpu, surface);
+#else
+  std::unique_ptr<VulkanContext> context = std::make_unique<VulkanContext>(instance, gpu);
+#endif
 
   // Initialize DriverDetails so that we can check for bugs to disable features if needed.
   context->InitDriverDetails();

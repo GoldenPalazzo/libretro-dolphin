@@ -99,7 +99,9 @@ public:
   VkInstance GetVulkanInstance() const { return m_instance; }
   VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; }
   VkDevice GetDevice() const { return m_device; }
+#ifdef __LIBRETRO__
   VkSurfaceKHR GetSurface() const { return m_surface; }
+#endif
   VkQueue GetGraphicsQueue() const { return m_graphics_queue; }
   u32 GetGraphicsQueueFamilyIndex() const { return m_graphics_queue_family_index; }
   VkQueue GetPresentQueue() const { return m_present_queue; }
