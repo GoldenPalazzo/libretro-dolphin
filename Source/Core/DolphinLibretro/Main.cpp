@@ -27,6 +27,7 @@
 #include "Core/System.h"
 #include "DolphinLibretro/Input.h"
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/SettingsManager.h"
 #include "DolphinLibretro/Video.h"
 #include "VideoBackends/OGL/OGLTexture.h"
 #include "VideoBackends/OGL/OGLGfx.h"
@@ -219,40 +220,7 @@ void retro_run(void)
         ->SetSystemFrameBuffer((GLuint)Libretro::Video::hw_render.get_current_framebuffer());
   }
 
-  if (Libretro::Options::internal_resolution.Updated())
-  {
-    //g_Config.iEFBScale = Libretro::Options::internal_resolution;
-    Config::SetCurrent(Config::GFX_EFB_SCALE, Libretro::Options::internal_resolution);
-
-    unsigned cmd = RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO;
-    if (Libretro::Video::hw_render.context_type == RETRO_HW_CONTEXT_DIRECT3D)
-      cmd = RETRO_ENVIRONMENT_SET_GEOMETRY;
-
-    retro_system_av_info info;
-    retro_get_system_av_info(&info);
-    Libretro::environ_cb(cmd, &info);
-  }
-
-  if (Libretro::widescreen != (g_widescreen->IsGameWidescreen() || g_Config.bWidescreenHack))
-  {
-    retro_system_av_info info;
-    retro_get_system_av_info(&info);
-    Libretro::environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &info);
-  }
-
-  if (Libretro::Options::irMode.Updated() || Libretro::Options::irCenter.Updated()
-      || Libretro::Options::irWidth.Updated() || Libretro::Options::irHeight.Updated()
-      || Libretro::Options::enableRumble.Updated())
-  {
-    Libretro::Input::ResetControllers();
-  }
-
-  if (Libretro::Options::WiimoteContinuousScanning.Updated())
-  {
-    Config::SetCurrent(Config::MAIN_WIIMOTE_CONTINUOUS_SCANNING,
-                       Libretro::Options::WiimoteContinuousScanning);
-    WiimoteReal::Initialize(Wiimote::InitializeMode::DO_NOT_WAIT_FOR_WIIMOTES);
-  }
+  Libretro::Options::SettingsManager::PollAndApply();
 
   RETRO_PERFORMANCE_INIT(dolphin_main_func);
   RETRO_PERFORMANCE_START(dolphin_main_func);
