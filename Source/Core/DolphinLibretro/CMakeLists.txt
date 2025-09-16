@@ -6,6 +6,7 @@ add_library(dolphin_libretro SHARED
 	Main.cpp
 	Options.cpp
 	Video.cpp
+	SettingsManager.cpp
 )
 
 if (NOT APPLE AND ENABLE_VULKAN)
