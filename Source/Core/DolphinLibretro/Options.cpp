@@ -1,9 +1,13 @@
-
 #include <libretro.h>
 #include "Common/Logging/Log.h"
 #include "VideoCommon/VideoConfig.h"
+#include "Core/Config/GraphicsSettings.h"
+#include "Core/Config/MainSettings.h"
+#include "Core/Config/SYSCONFSettings.h"
 
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/DolphinOption.h"
+#include "DolphinLibretro/InternalResolutionOption.h"
 
 namespace Libretro
 {
@@ -119,162 +123,8 @@ Option<std::string> backend("dolphin_renderer", "Backend", {"Hardware"
     , "Software", "Null"
 #endif
 });
-Option<int> internal_resolution(
-  "dolphin_efb_scale",
-  "Internal Resolution",
-  1,
-  {
-    "Native (640 x 528)",
-    "2x Native (1280 x 1056) for 720p",
-    "3x Native (1920 x 1584) for 1080p",
-    "4x Native (2560 x 2112) for 1440p",
-    "5x Native (3200 x 2640)",
-    "6x Native (3840 x 3168) for 4K",
-    "7x Native (4480 x 3696)",
-    "8x Native (5120 x 4224) for 5K",
-    "9x Native (5760 x 4752)",
-    "10x Native (6400 x 5280)",
-    "11x Native (7040 x 5808)",
-    "12x Native (7680 x 6336) for 8K"
-  }
-);
-Option<bool> widescreen("dolphin_widescreen", "Enable Widescreen (Wii)", true);
-Option<bool> widescreen_hack("dolphin_widescreen_hack", "Widescreen Hack", false);
-Option<ShaderCompilationMode> shader_compilation_mode(
-  "dolphin_shader_compilation_mode",
-  "Shader Compilation Mode",
-  {
-    {"Synchronous", ShaderCompilationMode::Synchronous},
-    {"Asynchronous Skip Rendering", ShaderCompilationMode::AsynchronousSkipRendering},
-    {"Synchronous Ubershaders", ShaderCompilationMode::SynchronousUberShaders},
-    {"Asynchronous Ubershaders", ShaderCompilationMode::AsynchronousUberShaders}
-  }
-);
-Option<bool> wait_for_shaders("dolphin_wait_for_shaders", "Compile Shaders Before Starting", false);
-Option<bool> progressive_scan("dolphin_progressive_scan", "Progressive Scan", true);
-Option<bool> use_pal60("dolphin_pal60", "PAL60", true);
-Option<int> anti_aliasing(
-  "dolphin_anti_aliasing",
-  "Anti-Aliasing",
-  {
-    "None",
-    "2x MSAA",
-    "4x MSAA",
-    "8x MSAA",
-    "16x MSAA",
-    "32x MSAA",
-    "2x SSAA",
-    "4x SSAA",
-    "8x SSAA",
-    "16x SSAA",
-    "32x SSAA"
-  }
-);
-Option<AnisotropicFilteringMode> max_anisotropy(
-  "dolphin_max_anisotropy",
-  "Max Anisotropy",
-  {
-    "1x Anisotropic",
-    "2x Anisotropic",
-    "4x Anisotropic",
-    "8x Anisotropic",
-    "16x Anisotropic",
-  }
-);
-Option<bool> skip_presenting_duplicate_frames("dolphin_skip_dupe_frames", "Skip Presenting Duplicate Frames", true);
-Option<bool> immediately_present_xfb("dolphin_immediate_xfb", "Immediately Present XFB", false);
-Option<bool> scaled_efb_copy("dolphin_efb_scaled_copy", "Scaled EFB Copy", true);
-Option<TextureFilteringMode> texture_filtering(
-  "dolphin_force_texture_filtering",
-  "Force Texture Filtering",
-  {
-    "Default",
-    "Nearest",
-    "Linear"
-  }
-);
-Option<bool> store_efb_copies_to_texture("dolphin_efb_to_texture", "Store EFB Copies to Texture Only", true);
-Option<int> texture_cache_accuracy(
-  "dolphin_texture_cache_accuracy",
-  "Texture Cache Accuracy",
-  {
-    {"Fast", 128},
-    {"Middle", 512},
-    {"Safe", 0}
-  }
-);
-Option<bool> gpu_texture_decoding("dolphin_gpu_texture_decoding", "GPU Texture Decoding", false);
-Option<bool> fast_depth_calculation("dolphin_fast_depth_calculation", "Fast Depth Calculation", true);
-Option<bool> enable_bounding_box("dolphin_bbox_enabled", "Enabled Bounding Box", false);
-Option<bool> disable_efb_to_vram_copies("dolphin_efb_to_vram", "Disable EFB to VRAM Copies", false);
 //Option<bool> loadCustomTextures("dolphin_load_custom_textures", "Load Custom Textures", false);
 //Option<bool> cacheCustomTextures("dolphin_cache_custom_textures", "Prefetch Custom Textures", false);
-Option<PowerPC::CPUCore> cpu_core(
-  "dolphin_cpu_core",
-  "CPU Core",
-  {
-#ifdef _M_X86_64
-    {"JIT64", PowerPC::CPUCore::JIT64},
-#elif _M_ARM_64
-    {"JITARM64", PowerPC::CPUCore::JITARM64},
-#endif
-    {"Cached Interpreter", PowerPC::CPUCore::CachedInterpreter},
-    {"Interpreter", PowerPC::CPUCore::Interpreter}
-  }
-);
-Option<float> cpu_clock_rate(
-  "dolphin_cpu_clock_rate",
-  "CPU Clock Rate",
-  {
-    {"100%", 1.0},
-    {"150%", 1.5},
-    {"200%", 2.0},
-    {"250%", 2.5},
-    {"300%", 3.0},
-    {"350%", 3.5},
-    {"400%", 4.0},
-    {"5%", 0.05},
-    {"10%", 0.1},
-    {"20%", 0.2},
-    {"30%", 0.3},
-    {"40%", 0.4},
-    {"50%", 0.5},
-    {"60%", 0.6},
-    {"70%", 0.7},
-    {"80%", 0.8},
-    {"90%", 0.9}
-  }
-);
-Option<float> emulation_speed_limit(
-  "dolphin_emulation_speed",
-  "Emulation Speed",
-  {
-    {"unlimited", 0.0},
-    {"100%", 1.0}
-  }
-);
-
-Option<DiscIO::Language> language(
-  "dolphin_language",
-  "Language",
-  {
-    {"English", DiscIO::Language::English},
-    {"Japanese", DiscIO::Language::Japanese},
-    {"German", DiscIO::Language::German},
-    {"French", DiscIO::Language::French},
-    {"Spanish", DiscIO::Language::Spanish},
-    {"Italian", DiscIO::Language::Italian},
-    {"Dutch", DiscIO::Language::Dutch},
-    {"Simplified Chinese", DiscIO::Language::SimplifiedChinese},
-    {"Traditional Chinese", DiscIO::Language::TraditionalChinese},
-    {"Korean", DiscIO::Language::Korean}
-  }
-);
-
-
-//golden: wont touch them (for now)
-Option<bool> fastmem("dolphin_fastmem", "Fastmem", true);
-Option<bool> fastDiscSpeed("dolphin_fast_disc_speed", "Speed Up Disc Transfer Rate", false);
 Option<int> irMode("dolphin_ir_mode", "Wiimote IR Mode", 1,
     {"Right Stick controls pointer (relative)",
      "Right Stick controls pointer (absolute)",
@@ -313,18 +163,9 @@ Option<int> irHeight("dolphin_ir_pitch", "Wiimote IR Total Pitch",
      {"85", 85}, {"86", 86}, {"87", 87}, {"88", 88}, {"89", 89}, {"90", 90}, {"91", 91}, {"92", 92}, {"93", 93}, {"94", 94},
      {"95", 95}, {"96", 96}, {"97", 97}, {"98", 98}, {"99", 99}, {"100", 100}, {"0", 0}, {"1", 1}, {"2", 2}, {"3", 3},
      {"4", 4}, {"5", 5}, {"6", 6}, {"7", 7}, {"8", 8}, {"9", 9}, {"10", 10}, {"11", 11}, {"12", 12}, {"13", 13}, {"14", 14}});
-Option<bool> enableRumble("dolphin_enable_rumble", "Rumble", true);
-Option<u32> sensorBarPosition("dolphin_sensor_bar_position", "Sensor Bar Position",
-                              {"Bottom", "Top"});
-Option<bool> WiimoteContinuousScanning("dolphin_wiimote_continuous_scanning", "Wiimote Continuous Scanning", false);
 Option<bool> altGCPorts("dolphin_alt_gc_ports_on_wii", "Use ports 5-8 for GameCube controllers in Wii mode", false);
 Option<unsigned int> audioMixerRate("dolphin_mixer_rate", "Audio Mixer Rate",
                                     {{"32000", 32000u}, {"48000", 48000u}});
-Option<bool> DSPHLE("dolphin_dsp_hle", "DSP HLE", true);
-Option<bool> DSPEnableJIT("dolphin_dsp_jit", "DSP Enable JIT", true);
-
-Option<bool> cheatsEnabled("dolphin_cheats_enabled", "Internal Cheats Enabled", false);
-Option<bool> osdEnabled("dolphin_osd_enabled", "OSD Enabled", true);
 Option<Common::Log::LogLevel> logLevel("dolphin_log_level", "Log Level", {
                                          {"Info", Common::Log::LogLevel::LINFO},
 #if defined(_DEBUG) || defined(DEBUGFAST)
@@ -333,5 +174,273 @@ Option<Common::Log::LogLevel> logLevel("dolphin_log_level", "Log Level", {
                                          {"Notice", Common::Log::LogLevel::LNOTICE},
                                          {"Error", Common::Log::LogLevel::LERROR},
                                          {"Warning", Common::Log::LogLevel::LWARNING}});
+
+
+std::vector<OptionUpdater*> dolphin_options;
+
+InternalResolutionOption internal_resolution;
+DolphinOption<bool> widescreen(
+  "dolphin_widescreen",
+  "Enable Widescreen (Wii)",
+  Config::SYSCONF_WIDESCREEN,
+  true
+);
+DolphinOption<bool> widescreen_hack(
+  "dolphin_widescreen_hack",
+  "Widescreen Hack",
+  Config::GFX_WIDESCREEN_HACK,
+  false
+);
+DolphinOption<ShaderCompilationMode> shader_compilation_mode(
+  "dolphin_shader_compilation_mode",
+  "Shader Compilation Mode",
+  Config::GFX_SHADER_COMPILATION_MODE,
+  {
+    {"Synchronous", ShaderCompilationMode::Synchronous},
+    {"Asynchronous Skip Rendering", ShaderCompilationMode::AsynchronousSkipRendering},
+    {"Synchronous Ubershaders", ShaderCompilationMode::SynchronousUberShaders},
+    {"Asynchronous Ubershaders", ShaderCompilationMode::AsynchronousUberShaders}
+  }
+);
+DolphinOption<bool> wait_for_shaders(
+  "dolphin_wait_for_shaders",
+  "Compile Shaders Before Starting",
+  Config::GFX_WAIT_FOR_SHADERS_BEFORE_STARTING,
+  false
+);
+DolphinOption<bool> progressive_scan(
+  "dolphin_progressive_scan",
+  "Progressive Scan",
+  Config::SYSCONF_PROGRESSIVE_SCAN,
+  true
+);
+DolphinOption<bool> use_pal60(
+  "dolphin_pal60",
+  "PAL60",
+  Config::SYSCONF_PAL60,
+  true
+);
+DolphinOption<u32> msaa(
+  "dolphin_msaa",
+  "Anti-Aliasing",
+  Config::GFX_MSAA,
+  {
+    "None",
+    "2x MSAA",
+    "4x MSAA",
+    "8x MSAA",
+    "16x MSAA",
+    "32x MSAA",
+  }
+);
+DolphinOption<bool> ssaa(
+  "dolphin_ssaa",
+  "Enable Super Sample Anti-Aliasing (SSAA)",
+  Config::GFX_SSAA,
+  false
+);
+DolphinOption<AnisotropicFilteringMode> max_anisotropy(
+  "dolphin_max_anisotropy",
+  "Max Anisotropy",
+  Config::GFX_ENHANCE_MAX_ANISOTROPY,
+  {
+    "1x Anisotropic",
+    "2x Anisotropic",
+    "4x Anisotropic",
+    "8x Anisotropic",
+    "16x Anisotropic",
+  }
+);
+DolphinOption<bool> skip_dupe_frames(
+  "dolphin_skip_dupe_frames",
+  "Skip Presenting Duplicate Frames",
+  Config::GFX_HACK_SKIP_DUPLICATE_XFBS,
+  true
+);
+DolphinOption<bool> immediate_xfb(
+  "dolphin_immediate_xfb",
+  "Immediately Present XFB",
+  Config::GFX_HACK_IMMEDIATE_XFB,
+  false
+);
+DolphinOption<bool> scaled_efb_copy(
+  "dolphin_efb_scaled_copy",
+  "Scaled EFB Copy",
+  Config::GFX_HACK_COPY_EFB_SCALED,
+  true
+);
+DolphinOption<TextureFilteringMode> texture_filtering(
+  "dolphin_force_texture_filtering",
+  "Force Texture Filtering",
+  Config::GFX_ENHANCE_FORCE_TEXTURE_FILTERING,
+  {
+    "Default",
+    "Nearest",
+    "Linear"
+  }
+);
+DolphinOption<bool> store_efb_to_texture(
+  "dolphin_efb_to_texture",
+  "Store EFB Copies to Texture Only",
+  Config::GFX_HACK_SKIP_EFB_COPY_TO_RAM,
+  true
+);
+DolphinOption<int> texture_cache_accuracy(
+  "dolphin_texture_cache_accuracy",
+  "Texture Cache Accuracy",
+  Config::GFX_SAFE_TEXTURE_CACHE_COLOR_SAMPLES,
+  {
+    {"Fast", 128},
+    {"Middle", 512},
+    {"Safe", 0}
+  }
+);
+DolphinOption<bool> gpu_texture_decoding(
+  "dolphin_gpu_texture_decoding",
+  "GPU Texture Decoding",
+  Config::GFX_ENABLE_GPU_TEXTURE_DECODING,
+  false
+);
+DolphinOption<bool> fast_depth_calculation(
+  "dolphin_fast_depth_calculation",
+  "Fast Depth Calculation",
+  Config::GFX_FAST_DEPTH_CALC,
+  true
+);
+DolphinOption<bool> enable_bounding_box(
+  "dolphin_bbox_enabled",
+  "Enabled Bounding Box",
+  Config::GFX_HACK_BBOX_ENABLE,
+  false
+);
+DolphinOption<bool> disable_efb_to_vram_copies(
+  "dolphin_efb_to_vram",
+  "Disable EFB to VRAM Copies",
+  Config::GFX_HACK_DISABLE_COPY_TO_VRAM,
+  false
+);
+DolphinOption<PowerPC::CPUCore> cpu_core(
+  "dolphin_cpu_core",
+  "CPU Core",
+  Config::MAIN_CPU_CORE,
+  {
+#ifdef _M_X86_64
+    {"JIT64", PowerPC::CPUCore::JIT64},
+#elif _M_ARM_64
+    {"JITARM64", PowerPC::CPUCore::JITARM64},
+#endif
+    {"Cached Interpreter", PowerPC::CPUCore::CachedInterpreter},
+    {"Interpreter", PowerPC::CPUCore::Interpreter}
+  }
+);
+DolphinOption<float> cpu_clock_rate(
+  "dolphin_cpu_clock_rate",
+  "CPU Clock Rate",
+  Config::MAIN_OVERCLOCK,
+  {
+    {"100%", 1.0},
+    {"150%", 1.5},
+    {"200%", 2.0},
+    {"250%", 2.5},
+    {"300%", 3.0},
+    {"350%", 3.5},
+    {"400%", 4.0},
+    {"5%", 0.05},
+    {"10%", 0.1},
+    {"20%", 0.2},
+    {"30%", 0.3},
+    {"40%", 0.4},
+    {"50%", 0.5},
+    {"60%", 0.6},
+    {"70%", 0.7},
+    {"80%", 0.8},
+    {"90%", 0.9}
+  }
+);
+DolphinOption<float> emulation_speed_limit(
+  "dolphin_emulation_speed",
+  "Emulation Speed",
+  Config::MAIN_EMULATION_SPEED,
+  {
+    {"unlimited", 0.0},
+    {"100%", 1.0}
+  }
+);
+
+DolphinOption<int> language(
+  "dolphin_language",
+  "Language",
+  Config::MAIN_GC_LANGUAGE,
+  {
+    {"English", (int)DiscIO::Language::English-1},
+    {"Japanese", (int)DiscIO::Language::Japanese-1},
+    {"German", (int)DiscIO::Language::German-1},
+    {"French", (int)DiscIO::Language::French-1},
+    {"Spanish", (int)DiscIO::Language::Spanish-1},
+    {"Italian", (int)DiscIO::Language::Italian-1},
+    {"Dutch", (int)DiscIO::Language::Dutch-1},
+    {"Simplified Chinese", (int)DiscIO::Language::SimplifiedChinese-1},
+    {"Traditional Chinese", (int)DiscIO::Language::TraditionalChinese-1},
+    {"Korean", (int)DiscIO::Language::Korean-1}
+  }
+);
+
+
+DolphinOption<bool> fastmem(
+  "dolphin_fastmem",
+  "Fastmem",
+  Config::MAIN_FASTMEM,
+  true
+);
+DolphinOption<bool> fast_disc_speed(
+  "dolphin_fast_disc_speed",
+  "Speed Up Disc Transfer Rate",
+  Config::MAIN_FAST_DISC_SPEED,
+  false
+);
+DolphinOption<bool> enable_rumble(
+  "dolphin_enable_rumble",
+  "Rumble",
+  Config::SYSCONF_WIIMOTE_MOTOR,
+  true
+);
+DolphinOption<u32> sensor_bar_position(
+  "dolphin_sensor_bar_position",
+  "Sensor Bar Position",
+  Config::SYSCONF_SENSOR_BAR_POSITION,
+  {"Bottom", "Top"}
+);
+DolphinOption<bool> continuous_scanning_wiimote(
+  "dolphin_wiimote_continuous_scanning",
+  "Wiimote Continuous Scanning",
+  Config::MAIN_WIIMOTE_CONTINUOUS_SCANNING,
+  false
+);
+DolphinOption<bool> dsp_hle(
+  "dolphin_dsp_hle",
+  "DSP HLE",
+  Config::MAIN_DSP_HLE,
+  true
+);
+DolphinOption<bool> dsp_enable_jit(
+  "dolphin_dsp_jit",
+  "DSP Enable JIT",
+  Config::MAIN_DSP_JIT,
+  true
+);
+
+DolphinOption<bool> cheats_enabled(
+  "dolphin_cheats_enabled",
+  "Internal Cheats Enabled",
+  Config::MAIN_ENABLE_CHEATS,
+  false
+);
+DolphinOption<bool> osd_enabled(
+  "dolphin_osd_enabled",
+  "OSD Enabled",
+  Config::MAIN_OSD_MESSAGES,
+  true
+);
+
 }  // namespace Options
 }  // namespace Libretro

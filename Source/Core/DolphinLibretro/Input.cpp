@@ -23,6 +23,7 @@
 #include "Core/Host.h"
 #include "DolphinLibretro/Input.h"
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/DolphinOption.h"
 #include "InputCommon/ControlReference/ControlReference.h"
 #include "InputCommon/ControlReference/ExpressionParser.h"
 #include "InputCommon/ControllerEmu/Control/Control.h"
@@ -645,7 +646,7 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
                                      "`" + devAnalog + ":Trigger0+`|L3");  // L-trigger Soft Press
     gcTriggers->SetControlExpression(3,
                                      "`" + devAnalog + ":Trigger1+`|R3");  // R-trigger Soft Press
-    if (Libretro::Options::enableRumble)
+    if (Libretro::Options::enable_rumble)
       gcRumble->SetControlExpression(0, "Rumble");
     static_cast<ControllerEmu::NumericSetting<bool>*>(gcOptions->numeric_settings[0].get())
       ->SetValue(true); // Always Connected
@@ -845,7 +846,7 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
         ->SetValue(false);  // Upright Wiimote
     static_cast<ControllerEmu::NumericSetting<bool>*>(wmOptions->numeric_settings[3].get())
         ->SetValue(false);  // Sideways Wiimote
-    if (Libretro::Options::enableRumble)
+    if (Libretro::Options::enable_rumble)
       wmRumble->SetControlExpression(0, "Rumble");
 
     switch (device)

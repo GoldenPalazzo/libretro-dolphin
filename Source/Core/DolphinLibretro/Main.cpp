@@ -27,6 +27,8 @@
 #include "Core/System.h"
 #include "DolphinLibretro/Input.h"
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/DolphinOption.h"
+#include "DolphinLibretro/InternalResolutionOption.h"
 #include "DolphinLibretro/SettingsManager.h"
 #include "DolphinLibretro/Video.h"
 #include "VideoBackends/OGL/OGLTexture.h"

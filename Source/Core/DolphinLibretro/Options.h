@@ -78,7 +78,7 @@ public:
     return (T)(*this) != value;
   }
 
-private:
+protected:
   void Register();
 
   const char* m_id;
@@ -114,66 +114,64 @@ private:
 //extern Option<PowerPC::CPUCore> cpu_core;
 //extern Option<float> cpuClockRate;
 //extern Option<float> EmulationSpeed;
-extern Option<bool> fastmem;
-extern Option<bool> fastDiscSpeed;
+// extern Option<bool> fastmem;
+// extern Option<bool> fastDiscSpeed;
 extern Option<int> irMode;
 extern Option<int> irCenter;
 extern Option<int> irWidth;
 extern Option<int> irHeight;
-extern Option<bool> enableRumble;
-extern Option<u32> sensorBarPosition;
-extern Option<bool> WiimoteContinuousScanning;
+// extern Option<bool> enableRumble;
+// extern Option<u32> sensorBarPosition;
+// extern Option<bool> WiimoteContinuousScanning;
 extern Option<bool> altGCPorts;
 extern Option<unsigned int> audioMixerRate;
-extern Option<bool> DSPHLE;
-extern Option<bool> DSPEnableJIT;
-extern Option<bool> cheatsEnabled;
+// extern Option<bool> DSPHLE;
+// extern Option<bool> DSPEnableJIT;
+// extern Option<bool> cheatsEnabled;
 extern Option<bool> osdEnabled;
 extern Option<Common::Log::LogLevel> logLevel;
 
 // General options
-extern Option<bool> dual_core;
-extern Option<float> emulation_speed_limit;
+// extern Option<bool> dual_core;
+// extern Option<float> emulation_speed_limit;
 
 // Graphics options general
 extern Option<std::string> backend;
 //extern Option<int> aspect_ratio;
-extern Option<bool> vsync;
-extern Option<ShaderCompilationMode> shader_compilation_mode;
-extern Option<bool> wait_for_shaders;
+// extern Option<bool> vsync;
+// extern Option<ShaderCompilationMode> shader_compilation_mode;
+// extern Option<bool> wait_for_shaders;
 // Graphics options enhancements
-extern Option<int> internal_resolution; //old efbScale
-extern Option<int> anti_aliasing;
-extern Option<TextureFilteringMode> texture_filtering;
-extern Option<AnisotropicFilteringMode> max_anisotropy;
-extern Option<OutputResamplingMode> output_resampling;
-extern Option<bool> scaled_efb_copy;
-extern Option<bool> widescreen_hack;
-extern Option<bool> disable_fog;
-extern Option<bool> per_pixel_lighting;
+// extern Option<int> internal_resolution; //old efbScale
+// extern Option<int> anti_aliasing;
+// extern Option<TextureFilteringMode> texture_filtering;
+// extern Option<AnisotropicFilteringMode> max_anisotropy;
+// extern Option<OutputResamplingMode> output_resampling;
+// extern Option<bool> scaled_efb_copy;
+// extern Option<bool> widescreen_hack;
+// extern Option<bool> disable_fog;
+// extern Option<bool> per_pixel_lighting;
 // Graphics options hacks
-extern Option<bool> skip_efb_access_from_cpu;
-extern Option<bool> store_efb_copies_to_texture;
-extern Option<bool> ignore_format_changes;
-extern Option<bool> store_xfb_copies_to_texture;
-extern Option<bool> immediately_present_xfb;
-extern Option<bool> skip_presenting_duplicate_frames;
-extern Option<bool> enable_bounding_box;
-extern Option<bool> fast_depth_calculation;
-extern Option<int> texture_cache_accuracy;
-extern Option<bool> gpu_texture_decoding;
+// extern Option<bool> skip_efb_access_from_cpu;
+// extern Option<bool> store_efb_copies_to_texture;
+// extern Option<bool> store_xfb_copies_to_texture;
+// extern Option<bool> immediately_present_xfb;
+// extern Option<bool> skip_presenting_duplicate_frames;
+// extern Option<bool> enable_bounding_box;
+// extern Option<bool> fast_depth_calculation;
+// extern Option<int> texture_cache_accuracy;
+// extern Option<bool> gpu_texture_decoding;
 // Graphics options advanced
-extern Option<bool> show_fps;
-extern Option<bool> progressive_scan;
-extern Option<bool> disable_efb_to_vram_copies;
+// extern Option<bool> progressive_scan;
+// extern Option<bool> disable_efb_to_vram_copies;
 // Wii options
-extern Option<bool> use_pal60;
-extern Option<DiscIO::Language> language;
-extern Option<bool> widescreen;
+// extern Option<bool> use_pal60;
+// extern Option<DiscIO::Language> language;
+// extern Option<bool> widescreen;
 
 // Advanced options
-extern Option<PowerPC::CPUCore> cpu_core;
-extern Option<float> cpu_clock_rate;
+// extern Option<PowerPC::CPUCore> cpu_core;
+// extern Option<float> cpu_clock_rate;
 
 }  // namespace Options
 }  // namespace Libretro

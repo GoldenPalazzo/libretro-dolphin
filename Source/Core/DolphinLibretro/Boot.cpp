@@ -18,6 +18,7 @@
 #include "DolphinLibretro/Input.h"
 #include "DolphinLibretro/Log.h"
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/DolphinOption.h"
 #include "DolphinLibretro/SettingsManager.h"
 #include "DolphinLibretro/Video.h"
 #include "InputCommon/ControllerInterface/ControllerInterface.h"

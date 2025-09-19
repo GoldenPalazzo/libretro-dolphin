@@ -39,6 +39,8 @@
 #include "Core/Core.h"
 #include "Core/Host.h"
 #include "DolphinLibretro/Options.h"
+#include "DolphinLibretro/DolphinOption.h"
+#include "DolphinLibretro/InternalResolutionOption.h"
 #include "VideoBackends/Null/NullGfx.h"
 #include "VideoBackends/OGL/OGLGfx.h"
 #include "VideoBackends/OGL/VideoBackend.h"
