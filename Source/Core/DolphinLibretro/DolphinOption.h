@@ -93,7 +93,7 @@ extern DolphinOption<bool> dual_core;
 extern DolphinOption<PowerPC::CPUCore> cpu_core;
 extern DolphinOption<float> cpu_clock_rate;
 extern DolphinOption<float> emulation_speed_limit;
-extern DolphinOption<int> language;
+// extern DolphinOption<int> language;
 extern DolphinOption<bool> fastmem;
 extern DolphinOption<bool> fast_disc_speed;
 extern DolphinOption<bool> enable_rumble;

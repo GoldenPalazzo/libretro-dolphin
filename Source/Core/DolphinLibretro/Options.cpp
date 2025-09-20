@@ -367,24 +367,25 @@ DolphinOption<float> emulation_speed_limit(
   }
 );
 
-DolphinOption<int> language(
-  "dolphin_language",
-  "Language",
-  Config::MAIN_GC_LANGUAGE,
-  {
-    {"English", (int)DiscIO::Language::English-1},
-    {"Japanese", (int)DiscIO::Language::Japanese-1},
-    {"German", (int)DiscIO::Language::German-1},
-    {"French", (int)DiscIO::Language::French-1},
-    {"Spanish", (int)DiscIO::Language::Spanish-1},
-    {"Italian", (int)DiscIO::Language::Italian-1},
-    {"Dutch", (int)DiscIO::Language::Dutch-1},
-    {"Simplified Chinese", (int)DiscIO::Language::SimplifiedChinese-1},
-    {"Traditional Chinese", (int)DiscIO::Language::TraditionalChinese-1},
-    {"Korean", (int)DiscIO::Language::Korean-1}
-  }
-);
-
+// DolphinOption<int> language(
+//   "dolphin_language",
+//   "Language",
+//   Config::MAIN_GC_LANGUAGE,
+//   {
+//     {"English", (int)DiscIO::Language::English-1},
+//     {"Japanese", (int)DiscIO::Language::Japanese-1},
+//     {"German", (int)DiscIO::Language::German-1},
+//     {"French", (int)DiscIO::Language::French-1},
+//     {"Spanish", (int)DiscIO::Language::Spanish-1},
+//     {"Italian", (int)DiscIO::Language::Italian-1},
+//     {"Dutch", (int)DiscIO::Language::Dutch-1},
+//     {"Simplified Chinese", (int)DiscIO::Language::SimplifiedChinese-1},
+//     {"Traditional Chinese", (int)DiscIO::Language::TraditionalChinese-1},
+//     {"Korean", (int)DiscIO::Language::Korean-1}
+//   }
+// );
+//
+LanguageOption language;
 
 DolphinOption<bool> fastmem(
   "dolphin_fastmem",
