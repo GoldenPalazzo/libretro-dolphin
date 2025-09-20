@@ -226,12 +226,10 @@ DolphinOption<u32> msaa(
   "Anti-Aliasing",
   Config::GFX_MSAA,
   {
-    "None",
-    "2x MSAA",
-    "4x MSAA",
-    "8x MSAA",
-    "16x MSAA",
-    "32x MSAA",
+    {"None", 1},
+    {"2x MSAA", 2},
+    {"4x MSAA", 4},
+    {"8x MSAA", 8},
   }
 );
 DolphinOption<bool> ssaa(
