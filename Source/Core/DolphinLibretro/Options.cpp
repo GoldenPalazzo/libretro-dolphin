@@ -243,11 +243,11 @@ DolphinOption<AnisotropicFilteringMode> max_anisotropy(
   "Max Anisotropy",
   Config::GFX_ENHANCE_MAX_ANISOTROPY,
   {
-    "1x Anisotropic",
-    "2x Anisotropic",
-    "4x Anisotropic",
-    "8x Anisotropic",
-    "16x Anisotropic",
+    {"1x Anisotropic", AnisotropicFilteringMode::Force1x},
+    {"2x Anisotropic", AnisotropicFilteringMode::Force2x},
+    {"4x Anisotropic", AnisotropicFilteringMode::Force4x},
+    {"8x Anisotropic", AnisotropicFilteringMode::Force8x},
+    {"16x Anisotropic", AnisotropicFilteringMode::Force16x},
   }
 );
 DolphinOption<bool> skip_dupe_frames(
