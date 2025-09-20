@@ -273,9 +273,9 @@ DolphinOption<TextureFilteringMode> texture_filtering(
   "Force Texture Filtering",
   Config::GFX_ENHANCE_FORCE_TEXTURE_FILTERING,
   {
-    "Default",
-    "Nearest",
-    "Linear"
+    {"Default", TextureFilteringMode::Default},
+    {"Linear", TextureFilteringMode::Linear},
+    {"Nearest", TextureFilteringMode::Nearest}
   }
 );
 DolphinOption<bool> store_efb_to_texture(
