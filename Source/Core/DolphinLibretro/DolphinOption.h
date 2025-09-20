@@ -53,7 +53,7 @@ public:
   {
     if (update)
       this->Updated();
-    Config::SetCurrent(m_dolphin_info, this->m_value);
+    Config::SetBaseOrCurrent(m_dolphin_info, this->m_value);
   }
 
   virtual void CheckAndUpdateDolphin() override
