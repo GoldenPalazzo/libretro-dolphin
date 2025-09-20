@@ -8,6 +8,7 @@
 #include "DolphinLibretro/Options.h"
 #include "DolphinLibretro/DolphinOption.h"
 #include "DolphinLibretro/InternalResolutionOption.h"
+#include "DolphinLibretro/LanguageOption.h"
 
 namespace Libretro
 {
